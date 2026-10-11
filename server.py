@@ -260,46 +260,49 @@ def analyze_live(data: dict) -> dict:
     lat = float(data.get("lat", 13.08))
     lon = float(data.get("lon", 80.27))
 
+    # True Live API: Fetches the preceding 14 days up to today's live precipitation
     url = (
-        f"https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}"
-        f"&start_date=2023-11-01&end_date=2023-11-30&daily=precipitation_sum,temperature_2m_max&timezone=auto"
+        f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}"
+        f"&past_days=14&forecast_days=1&daily=precipitation_sum,temperature_2m_max&timezone=auto"
     )
     req = urllib.request.Request(
         url,
-        headers={"User-Agent": "Mozilla/5.0 (compatible; VarshaSyncResearch/1.0; +https://varshasync.onrender.com)"}
+        headers={"User-Agent": "VarshaSyncLive/2.0 (resilience-monitor)"}
     )
 
     custom_series = []
     try:
         with urllib.request.urlopen(req, timeout=10) as r:
             m_data = json.load(r)["daily"]
-            p_list = [v if v is not None else 0.0 for v in m_data.get("precipitation_sum", [])]
-            t_list = [v if v is not None else 30.0 for v in m_data.get("temperature_2m_max", [])]
+            p_list = [float(v) if v is not None else 0.0 for v in m_data.get("precipitation_sum", [])]
+            t_list = [float(v) if v is not None else 32.0 for v in m_data.get("temperature_2m_max", [])]
             custom_series = [{"p": round(p, 2), "t": round(t, 1)} for p, t in zip(p_list, t_list)]
     except Exception as e:
-        print(f"[Warning] Weather API request failed ({e}). Using synthetic baseline series.")
-        # Fallback series so calculations never break
-        custom_series = [{"p": round(1.2 + (i % 4) * 0.5, 2), "t": 31.0} for i in range(29)]
-        custom_series.append({"p": 84.5, "t": 27.5})
+        print(f"[Warning] Live weather fetch failed ({e}). Defaulting to current fair-weather baseline.")
+        # Realistic fair-weather fallback (clear skies, dry ground, normal temps)
+        custom_series = [{"p": 0.0, "t": 32.5} for _ in range(14)]
+        custom_series.append({"p": 0.0, "t": 33.0})
 
     idx = len(custom_series) - 1
     surge = custom_series[idx]["p"]
     prev_mean = engine.mean_preceding([d["p"] for d in custom_series], idx)
-    w = engine.whiplash_index(surge, prev_mean)
+    
+    # Live WPS Calculation
+    w = engine.whiplash_index(surge, prev_mean) if hasattr(engine, 'whiplash_index') else round(surge / max(prev_mean, 0.1), 1)
     LEDGER.last_surge = surge
 
-    # Safe call for localities
+    # Locality scoring
     try:
         dynamic_wards = fetch_nearby_localities(lat, lon)
         if not dynamic_wards:
-            raise ValueError("Empty localities returned")
+            raise ValueError("Empty localities list")
     except Exception as e:
-        print(f"[Warning] Localities fetch failed ({e}). Using default ward profiles.")
+        print(f"[Warning] Localities fetch failed ({e}). Using regional defaults.")
         dynamic_wards = [
-            {"id": "w1", "name": "Zone A - Central", "elev": 12, "soil": "clay", "drain": "fair", "septic": 40, "pop": 85000},
-            {"id": "w2", "name": "Zone B - Lowland", "elev": 4, "soil": "alluvial", "drain": "poor", "septic": 75, "pop": 120000},
-            {"id": "w3", "name": "Zone C - Coastal", "elev": 2, "soil": "sandy", "drain": "poor", "septic": 85, "pop": 95000},
-            {"id": "w4", "name": "Zone D - Ridge", "elev": 24, "soil": "rocky", "drain": "good", "septic": 20, "pop": 60000},
+            {"id": "w1", "name": "Sector 1 - Central Zone", "elev": 15, "soil": "clay", "drain": "fair", "septic": 35, "pop": 85000},
+            {"id": "w2", "name": "Sector 2 - Lowland Canal", "elev": 4, "soil": "alluvial", "drain": "poor", "septic": 75, "pop": 110000},
+            {"id": "w3", "name": "Sector 3 - Outer Residential", "elev": 22, "soil": "sandy loam", "drain": "good", "septic": 25, "pop": 60000},
+            {"id": "w4", "name": "Sector 4 - Commercial Market", "elev": 10, "soil": "clay loam", "drain": "fair", "septic": 50, "pop": 95000},
         ]
 
     calc_wards = ward_scores(surge, dynamic_wards)
@@ -307,13 +310,21 @@ def analyze_live(data: dict) -> dict:
 
     return {
         "series": custom_series,
-        "metrics": {"idx": idx, "from": max(0, idx - engine.PRECEDING_DAYS), "surge": surge,
-                    "mean": prev_mean, "W": w, "level": engine.whiplash_key(w)},
+        "metrics": {
+            "idx": idx,
+            "from": max(0, idx - 14),
+            "surge": surge,
+            "mean": prev_mean,
+            "W": w,
+            "level": engine.whiplash_key(w) if hasattr(engine, 'whiplash_key') else ("Nominal" if w < 3 else "Warning")
+        },
         "dynamic_wards": dynamic_wards,
         "wards": calc_wards,
         "advisory": [r["id"] for r in calc_wards if r.get("boil", False)],
-        "tank": {"y": a["yield_l"], "daily": a["daily_use_l"], "stored": a["stored_l"],
-                 "over": a["overflow_l"], "room": a["spare_room_l"], "days": a["days"]},
+        "tank": {
+            "y": a["yield_l"], "daily": a["daily_use_l"], "stored": a["stored_l"],
+            "over": a["overflow_l"], "room": a["spare_room_l"], "days": a["days"]
+        },
         "tickets": rank_tickets(surge, dynamic_wards),
     }
 
