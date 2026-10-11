@@ -4,19 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>VarshaSync (RainShift) - Rain and Water Guide</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+
 <script>
-  // Suppress the Tailwind CDN production warning
-  const _warn = console.warn;
+  // Mute Tailwind standalone CDN production build notice in console
+  const _origWarn = console.warn;
   console.warn = function(...args) {
     if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
-    _warn.apply(console, args);
+    _origWarn.apply(console, args);
   };
 </script>
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
 <style>
 :root{
   box-sizing:border-box;
@@ -165,7 +168,7 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
 </head>
 <body>
 
-<!-- ============ Sticky top bar: brand, languages, theme, module tabs ============ -->
+<!-- Sticky top bar: brand, languages, theme, module tabs -->
 <div class="topbar">
   <div class="mx-auto max-w-6xl px-4">
     <div class="flex items-center justify-between gap-3">
@@ -199,7 +202,7 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
 
 <div id="backendErr" hidden role="alert" style="background:var(--crit-bg);color:var(--crit);border-bottom:2px solid var(--crit);padding:14px 16px;font-weight:600;text-align:center" data-i18n="be_err"></div>
 
-<!-- ============ Hero ============ -->
+<!-- Hero -->
 <header class="hero" id="hero" data-level="crit">
   <canvas id="wx" aria-hidden="true"></canvas>
   <div class="mx-auto max-w-6xl px-4 pt-10 pb-8">
@@ -247,7 +250,7 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
 
 <main class="mx-auto max-w-6xl px-4 py-8">
 
-<!-- ================= Module 1: Sudden weather flip ================= -->
+<!-- Module 1: Sudden weather flip -->
 <section class="panel" id="panel-flip" role="tabpanel" aria-labelledby="tab-flip">
   <div class="mb-5">
     <h2 class="text-3xl font-extrabold" data-i18n="nav_flip"></h2>
@@ -314,7 +317,7 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
   </div>
 </section>
 
-<!-- ================= Module 2: Dirty water alert ================= -->
+<!-- Module 2: Dirty water alert -->
 <section class="panel" id="panel-dirty" role="tabpanel" aria-labelledby="tab-dirty" hidden>
   <div class="mb-5">
     <h2 class="text-3xl font-extrabold" data-i18n="nav_dirty"></h2>
@@ -344,7 +347,7 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
   <div class="card p-5 mt-6" id="wardDetail"></div>
 </section>
 
-<!-- ================= Module 3: Monsoon checklist ================= -->
+<!-- Module 3: Monsoon checklist -->
 <section class="panel" id="panel-guide" role="tabpanel" aria-labelledby="tab-guide" hidden>
   <div class="mb-5">
     <h2 class="text-3xl font-extrabold" data-i18n="nav_guide"></h2>
@@ -366,7 +369,7 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
   <div class="grid lg:grid-cols-3 gap-5" id="phases"></div>
 </section>
 
-<!-- ================= Module 4: Saved rainwater ================= -->
+<!-- Module 4: Saved rainwater -->
 <section class="panel" id="panel-tank" role="tabpanel" aria-labelledby="tab-tank" hidden>
   <div class="mb-5">
     <h2 class="text-3xl font-extrabold" data-i18n="nav_tank"></h2>
@@ -432,7 +435,7 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
   </div>
 </section>
 
-<!-- ================= Module 5: Report a problem ================= -->
+<!-- Module 5: Report a problem -->
 <section class="panel" id="panel-report" role="tabpanel" aria-labelledby="tab-report" hidden>
   <div class="mb-5">
     <h2 class="text-3xl font-extrabold" data-i18n="nav_report"></h2>
@@ -472,7 +475,7 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
   </div>
 </section>
 
-<!-- ================= Glossary ================= -->
+<!-- Glossary -->
 <section class="mt-12" aria-labelledby="glTitle">
   <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
     <div>
@@ -781,7 +784,7 @@ const GLOSS = [
 ];
 
 /* =====================================================================
-   HELPERS
+   HELPERS & REUSABLE UTILITIES
    ===================================================================== */
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -804,12 +807,12 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;'
 const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-  set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage may be blocked */ } }
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage block safe */ } }
 };
-const wardName = w => (w.name && (w.name[lang] || w.name.en)) || w.name || '';
+const wardName = w => (w && w.name && (w.name[lang] || w.name.en)) || (w && w.name) || '';
 
 /* =====================================================================
-   BACKEND CALLS (Python does ALL calculations in server.py / engine.py)
+   BACKEND CALLS (server.py / engine.py)
    ===================================================================== */
 async function api(path, body) {
   const res = await fetch(path, body === undefined ? {} : {
@@ -826,13 +829,29 @@ const showBackendError = on => {
   if (el) el.hidden = on === false; 
 };
 
-/* Read-only views of Python backend results */
-const metrics = () => calc && calc.metrics ? calc.metrics : {};
-const wardCalc = w => (calc && calc.wards ? calc.wards.find(x => x.id === w.id) : null);
-const wardRisk = w => wardCalc(w);
-const complaints = w => { const wc = wardCalc(w); return wc ? wc.complaints : []; };
-const advisoryWards = () => (calc && calc.advisory ? WARDS.wards.filter(w => calc.advisory.includes(w.id)) : []);
-const riskClass = s => (s > 70 ? 'crit' : s >= 40 ? 'mod' : 'safe');
+/* Read-only views of Python backend results (Hoisted and safe) */
+function metrics() {
+  return (calc && calc.metrics) ? calc.metrics : { W: 0, level: 'safe', surge: 0, mean: 0 };
+}
+function wardCalc(w) {
+  return (calc && calc.wards && w) ? (calc.wards.find(x => x.id === w.id) || null) : null;
+}
+function wardRisk(w) { 
+  return wardCalc(w) || { score: 0, rain: 0, choke: 0, low: 0 }; 
+}
+function complaints(w) { 
+  const wc = wardCalc(w); 
+  return wc && wc.complaints ? wc.complaints : 0; 
+}
+function advisoryWards() {
+  return (calc && calc.advisory && WARDS && WARDS.wards)
+    ? WARDS.wards.filter(w => calc.advisory.includes(w.id))
+    : [];
+}
+function riskClass(s) { 
+  return s > 70 ? 'crit' : s >= 40 ? 'mod' : 'safe'; 
+}
+
 const SEV_STYLE = {
   crit: { bg: 'var(--crit-bg)', fg: 'var(--crit)' },
   high: { bg: 'var(--warn-bg)', fg: 'var(--warn)' },
@@ -853,7 +872,6 @@ async function refresh(fromSlider) {
   try {
     let out;
     if (state.scenario === 'live') {
-      // Preserve live weather telemetry and update with current tank state
       out = await api('/api/live', {
         lat: state.lat || 13.08,
         lon: state.lon || 80.27,
@@ -877,6 +895,7 @@ async function refresh(fromSlider) {
 let toastTimer;
 function toast(msg) {
   const el = $('#toast');
+  if (!el) return;
   el.textContent = msg;
   el.classList.add('show');
   clearTimeout(toastTimer);
@@ -884,7 +903,7 @@ function toast(msg) {
 }
 
 /* =====================================================================
-   RENDER: static text
+   STATIC CONTENT & TEXT
    ===================================================================== */
 function applyStatic() {
   document.documentElement.lang = lang;
@@ -899,7 +918,7 @@ function applyStatic() {
 }
 
 /* =====================================================================
-   RENDER: hero + gauge
+   HERO & GAUGES
    ===================================================================== */
 let gaugeShown = 0, gaugeRaf = 0;
 function animateGauge(to) {
@@ -910,39 +929,46 @@ function animateGauge(to) {
     const k = reduce ? 1 : clamp((now - t0) / dur, 0, 1);
     const e = 1 - Math.pow(1 - k, 3);
     gaugeShown = from + (to - from) * e;
-    $('#gaugeNum').textContent = nf(gaugeShown, 1);
+    const numEl = $('#gaugeNum');
+    if (numEl) numEl.textContent = nf(gaugeShown, 1);
     if (k < 1) gaugeRaf = requestAnimationFrame(step);
   };
   gaugeRaf = requestAnimationFrame(step);
 }
+
 function renderHero() {
   const m = metrics();
   const hero = $('#hero');
-  hero.dataset.level = m.level;
+  if (hero) hero.dataset.level = m.level;
   const arc = $('#gaugeArc');
-  arc.style.strokeDashoffset = String(282.74 * (1 - clamp(m.W, 0, 60) / 60));
-  arc.style.stroke = m.level === 'crit' ? '#ff8f86' : m.level === 'mod' ? '#ffcf6b' : '#7ef0be';
+  if (arc) {
+    arc.style.strokeDashoffset = String(282.74 * (1 - clamp(m.W, 0, 60) / 60));
+    arc.style.stroke = m.level === 'crit' ? '#ff8f86' : m.level === 'mod' ? '#ffcf6b' : '#7ef0be';
+  }
   animateGauge(m.W);
   $('#lvlTitle').textContent = t('lvl_' + m.level);
   $('#lvlMsg').textContent = t('msg_' + m.level);
   $('#chipRain').textContent = nf(m.surge, 1) + ' mm';
   $('#chipDry').textContent = nf(m.mean, 2) + ' mm';
-  $('#chipWards').textContent = nf(advisoryWards().length) + ' / ' + nf(WARDS.wards.length);
-  $('#chipPending').textContent = nf(calc.tickets.filter(x => x.status === 'pending').length);
+  $('#chipWards').textContent = nf(advisoryWards().length) + ' / ' + nf(WARDS.wards ? WARDS.wards.length : 0);
+  $('#chipPending').textContent = nf(calc && calc.tickets ? calc.tickets.filter(x => x.status === 'pending').length : 0);
   $$('#scenarios .scbtn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sc === state.scenario)));
   wx.rain = clamp(m.surge / 100, 0.05, 1);
 }
 
 /* =====================================================================
-   RENDER: Module 1
+   MODULE 1: FLIP
    ===================================================================== */
 let chart;
 function chartColors(m) {
   const dry = cssv('--dry'), crit = cssv('--crit'), rain = cssv('--rain');
+  if (!calc || !calc.series) return [];
   return calc.series.map((_, i) => i === m.idx ? crit : (i >= m.from && i < m.idx) ? dry : rain + '99');
 }
 function initChart() {
-  chart = new Chart($('#rainChart'), {
+  const canvas = $('#rainChart');
+  if (!canvas) return;
+  chart = new Chart(canvas, {
     data: {
       labels: [],
       datasets: [
@@ -964,7 +990,7 @@ function initChart() {
   });
 }
 function updateChart() {
-  if (!chart || !calc) return;
+  if (!chart || !calc || !calc.series) return;
   const m = metrics();
   const muted = cssv('--muted'), line = cssv('--line'), dry = cssv('--dry');
   Chart.defaults.color = muted;
@@ -1002,7 +1028,7 @@ function renderFlip(fromSlider) {
 }
 
 /* =====================================================================
-   RENDER: Module 2 (Map & Wards)
+   MODULE 2: WARDS & RADAR
    ===================================================================== */
 function renderDirty() {
   const adv = advisoryWards();
@@ -1028,7 +1054,8 @@ function renderDirty() {
       '<div><div class="display text-xl font-extrabold c-safe">' + esc(t('adv_title_off')) + '</div><p class="mt-1">' + esc(t('adv_msg_off')) + '</p></div></div>';
   }
 
-  $('#wardGrid').innerHTML = WARDS.wards.map(w => {
+  const wardList = (WARDS && WARDS.wards) ? WARDS.wards : [];
+  $('#wardGrid').innerHTML = wardList.map(w => {
     const r = wardRisk(w), c = riskClass(r.score);
     const lab = c === 'crit' ? t('rk_high') : c === 'mod' ? t('rk_watch') : t('rk_low');
     return '<button type="button" class="ward" data-ward="' + w.id + '" aria-pressed="' + (w.id === state.sel) + '">' +
@@ -1044,7 +1071,9 @@ function renderDirty() {
 }
 
 function renderWardDetail() {
-  const w = WARDS.wards.find(x => x.id === state.sel) || WARDS.wards[0];
+  const wardList = (WARDS && WARDS.wards) ? WARDS.wards : [];
+  if (!wardList.length) return;
+  const w = wardList.find(x => x.id === state.sel) || wardList[0];
   const r = wardRisk(w), c = riskClass(r.score);
   const row = (label, part, max, color) =>
     '<div><div class="flex justify-between gap-2 text-sm font-semibold"><span>' + esc(label) + '</span><span>' + nf(part, 1) + ' ' + esc(t('bd_of')) + ' ' + max + '</span></div>' +
@@ -1066,10 +1095,10 @@ function renderWardDetail() {
       '<div class="grid grid-cols-2 gap-3 content-start">' +
         fact(t('w_elev'), nf(w.elevation_m, 1) + ' m') +
         fact(t('w_low'), w.low_lying ? t('yes') : t('no')) +
-        fact(t('w_drain'), t('dt_' + w.drainage.type)) +
+        fact(t('w_drain'), t('dt_' + (w.drainage ? w.drainage.type : 'open_channel'))) +
         fact(t('w_complaints'), nf(complaints(w))) +
-        fact(t('w_desilt'), t('w_months', { n: nf(w.drainage.last_desilted_months_ago) })) +
-        fact(t('w_pop'), nf(w.population)) +
+        fact(t('w_desilt'), t('w_months', { n: nf(w.drainage ? w.drainage.last_desilted_months_ago : 0) })) +
+        fact(t('w_pop'), nf(w.population || 0)) +
       '</div>' +
     '</div>';
 }
@@ -1099,28 +1128,19 @@ async function copyAlert() {
 }
 
 /* =====================================================================
-   RENDER: Module 3 (Checklist)
+   MODULE 3: GUIDE CHECKLIST
    ===================================================================== */
 const PH = [
   { id: 1, sci: 'Pre-Monsoon', tasks: ['p1a', 'p1b', 'p1c', 'p1d'] },
   { id: 2, sci: 'Syn-Monsoon', tasks: ['p2a', 'p2b', 'p2c', 'p2d'] },
   { id: 3, sci: 'Post-Monsoon', tasks: ['p3a', 'p3b', 'p3c', 'p3d'] }
 ];
-/* Read-only views of Python backend results */
-const metrics = () => (calc && calc.metrics ? calc.metrics : {});
-const wardCalc = w => (calc && calc.wards ? calc.wards.find(x => x.id === w.id) : null);
-const wardRisk = w => wardCalc(w);
-const complaints = w => { const wc = wardCalc(w); return wc ? wc.complaints : []; };
-const advisoryWards = () => (calc && calc.advisory && WARDS && WARDS.wards ? WARDS.wards.filter(w => calc.advisory.includes(w.id)) : []);
-const riskClass = s => (s > 70 ? 'crit' : s >= 40 ? 'mod' : 'safe');
-const SEV_STYLE = {
-  crit: { bg: 'var(--crit-bg)', fg: 'var(--crit)' },
-  high: { bg: 'var(--warn-bg)', fg: 'var(--warn)' },
-  med: { bg: 'var(--soft)', fg: 'var(--rain)' },
-  low: { bg: 'var(--ok-bg)', fg: 'var(--ok)' }
-};
 
-const suggestedStage = () => (metrics().level === 'safe' ? 1 : 2);
+function suggestedStage() {
+  const m = metrics();
+  return (m && m.level === 'safe') ? 1 : 2;
+}
+
 function renderGuide() {
   const sug = suggestedStage();
   $('#stageBtns').innerHTML = PH.map(p =>
@@ -1143,13 +1163,13 @@ function renderGuide() {
         '<label class="task"><input type="checkbox" data-task="' + k + '"' + (state.checks[k] ? ' checked' : '') + (locked ? ' disabled' : '') + '><span>' + esc(t(k)) + '</span></label>'
       ).join('') + '</div>';
   }).join('');
-  const pct = Math.round(done / total * 100);
+  const pct = total ? Math.round(done / total * 100) : 0;
   $('#overallPct').textContent = nf(pct) + '% (' + done + '/' + total + ' ' + t('m3_done') + ')';
   $('#overallBar').style.width = pct + '%';
 }
 
 /* =====================================================================
-   RENDER: Module 4 (Tank)
+   MODULE 4: TANK
    ===================================================================== */
 function renderRoofTypes() {
   $('#roofTypes').innerHTML = Object.keys(RC).map(k =>
@@ -1159,7 +1179,7 @@ function renderRoofTypes() {
 const DROP_SVG = '<svg viewBox="0 0 18 24" width="18" height="24"><path d="M9 1C9 1 2 9.5 2 15a7 7 0 0 0 14 0C16 9.5 9 1 9 1Z" fill="var(--rain)"/></svg>';
 function renderTank() {
   const k = state.tank;
-  const r = calc.tank;
+  const r = (calc && calc.tank) ? calc.tank : { y: 0, daily: 0, stored: 0, days: 0, over: 0, room: 0 };
   $('#tkRoofV').textContent = nf(k.roof) + ' m²';
   $('#tkRainV').textContent = nf(k.rain) + ' mm';
   $('#tkOccV').textContent = nf(k.occ);
@@ -1170,8 +1190,10 @@ function renderTank() {
   $('#daysOut').textContent = nf(r.days, 1) + ' ' + t('days');
   const fill = k.cap ? clamp(r.stored / k.cap, 0, 1) : 0;
   const water = $('#tankWater');
-  water.setAttribute('y', String(176 - 152 * fill));
-  water.setAttribute('height', String(152 * fill));
+  if (water) {
+    water.setAttribute('y', String(176 - 152 * fill));
+    water.setAttribute('height', String(152 * fill));
+  }
   $('#tankPct').textContent = Math.round(fill * 100) + '%';
   $('#tankNote').textContent = r.over > 0 ? t('m4_full', { x: nf(r.over) }) : t('m4_room', { x: nf(r.room) });
   const whole = Math.min(30, Math.floor(r.days)), frac = r.days - Math.floor(r.days);
@@ -1183,15 +1205,18 @@ function renderTank() {
 }
 
 /* =====================================================================
-   RENDER: Module 5 (Ledger)
+   MODULE 5: TICKETS & LEDGER
    ===================================================================== */
 function fillFormSelects() {
   const typeSel = $('#fType'), wardSel = $('#fWard');
+  if (!typeSel || !wardSel) return;
   const tv = typeSel.value, wv = wardSel.value;
   typeSel.innerHTML = '<option value="">' + esc(t('f_choose')) + '</option>' +
     ['sewage', 'canal', 'sump', 'drain'].map(k => '<option value="' + k + '">' + esc(t('tp_' + k)) + '</option>').join('');
+  
+  const wardList = (WARDS && WARDS.wards) ? WARDS.wards : [];
   wardSel.innerHTML = '<option value="">' + esc(t('f_choose')) + '</option>' +
-    WARDS.wards.map(w => '<option value="' + w.id + '">' + esc(t('ward')) + ' ' + w.id + ': ' + esc(wardName(w)) + '</option>').join('');
+    wardList.map(w => '<option value="' + w.id + '">' + esc(t('ward')) + ' ' + w.id + ': ' + esc(wardName(w)) + '</option>').join('');
   typeSel.value = tv; wardSel.value = wv;
 }
 
@@ -1207,14 +1232,15 @@ function ago(ts) {
 }
 
 function renderLedger() {
-  const pend = calc.tickets.filter(x => x.status === 'pending');
-  const fixed = calc.tickets.filter(x => x.status === 'resolved');
+  const tickets = (calc && calc.tickets) ? calc.tickets : [];
+  const pend = tickets.filter(x => x.status === 'pending');
+  const fixed = tickets.filter(x => x.status === 'resolved');
   const scored = x => ({ tk: x, sev: x.sev, lvl: x.level });
   const pendSorted = pend.map(scored).sort((a, b) => b.sev - a.sev);
   const fixedSorted = fixed.map(scored).sort((a, b) => b.sev - a.sev);
 
   const counts = { crit: 0, high: 0, med: 0, low: 0 };
-  pendSorted.forEach(x => counts[x.lvl]++);
+  pendSorted.forEach(x => { if (counts[x.lvl] !== undefined) counts[x.lvl]++; });
   const lv = ['crit', 'high', 'med', 'low'];
   $('#qbar').innerHTML = pend.length
     ? lv.map(k => '<i style="flex-grow:' + counts[k] + ';background:' + SEV_STYLE[k].fg + '"></i>').join('')
@@ -1224,7 +1250,7 @@ function renderLedger() {
 
   $$('#filters .chip').forEach(b => {
     const f = b.dataset.f;
-    const n = f === 'all' ? calc.tickets.length : f === 'pending' ? pend.length : fixed.length;
+    const n = f === 'all' ? tickets.length : f === 'pending' ? pend.length : fixed.length;
     b.textContent = t(f === 'all' ? 'l_all' : f === 'pending' ? 'l_wait' : 'l_fixed') + ' ' + nf(n);
     b.setAttribute('aria-pressed', String(state.filter === f));
   });
@@ -1236,8 +1262,9 @@ function renderLedger() {
 
   if (!list.length) { $('#ledger').innerHTML = '<div class="card p-6 text-center muted">' + esc(t('l_empty')) + '</div>'; return; }
   let rank = 0;
+  const wardList = (WARDS && WARDS.wards) ? WARDS.wards : [];
   $('#ledger').innerHTML = list.map(x => {
-    const tk = x.tk, w = WARDS.wards.find(q => q.id === tk.ward), lvl = x.lvl, st = SEV_STYLE[lvl];
+    const tk = x.tk, w = wardList.find(q => q.id === tk.ward), lvl = x.lvl, st = SEV_STYLE[lvl] || SEV_STYLE.low;
     const done = tk.status === 'resolved';
     if (!done) rank++;
     return '<div class="tk" data-done="' + done + '">' +
@@ -1255,7 +1282,7 @@ function renderLedger() {
 }
 
 /* =====================================================================
-   RENDER: Glossary
+   GLOSSARY
    ===================================================================== */
 function renderGlossary() {
   const q = $('#glSearch').value.trim().toLowerCase();
@@ -1309,7 +1336,7 @@ async function loadScenario(key, silent) {
 }
 
 /* =====================================================================
-   WEATHER CANVAS (Hero)
+   WEATHER CANVAS (Rain Animation)
    ===================================================================== */
 const wx = { drops: [], w: 0, h: 0, wind: 0, rain: 0.9, ctx: null };
 function wxResize() {
@@ -1342,11 +1369,11 @@ function wxLoop() {
 }
 
 /* =====================================================================
-   LIVE RADAR MAP & GEOLOCATION
+   LIVE RADAR & GEOLOCATION
    ===================================================================== */
 function drawRadar(lat, lon) {
   const canvas = $('#liveRadarCanvas');
-  if (!canvas) return;
+  if (!canvas || !canvas.parentElement) return;
   const ctx = canvas.getContext('2d');
   canvas.width = canvas.parentElement.clientWidth;
   canvas.height = canvas.parentElement.clientHeight;
@@ -1361,7 +1388,7 @@ function drawRadar(lat, lon) {
     ctx.stroke();
   });
   
-  // User coordinate pin
+  // User coordinate marker
   ctx.fillStyle = cssv('--crit');
   ctx.beginPath();
   ctx.arc(cx, cy, 7, 0, 2 * Math.PI);
@@ -1382,12 +1409,10 @@ function handleLiveLocation() {
       const { latitude, longitude } = pos.coords;
       $('#mapCoordsDisplay').textContent = `Lat: ${latitude.toFixed(3)}, Lon: ${longitude.toFixed(3)}`;
       
-      // Store coordinates and lock scenario state to live
       state.lat = latitude;
       state.lon = longitude;
       state.scenario = 'live';
 
-      // Visually un-press any demo scenario buttons
       $$('#scenarios .scbtn').forEach(b => b.setAttribute('aria-pressed', 'false'));
 
       try {
@@ -1417,8 +1442,9 @@ function handleLiveLocation() {
     { timeout: 10000 }
   );
 }
+
 /* =====================================================================
-   EVENTS
+   EVENT BINDINGS
    ===================================================================== */
 function bind() {
   $('#locBtn').addEventListener('click', handleLiveLocation);
@@ -1527,7 +1553,7 @@ function bind() {
       await api('/api/tickets/status', { id: tk.id, status: resolving ? 'resolved' : 'pending' });
       await refresh(true);
       const w = WARDS.wards.find(x => x.id === tk.ward);
-      toast(t(resolving ? 'toast_done' : 'toast_reopen', { w: t('ward') + ' ' + w.id, s: nf(wardRisk(w).score, 1) }));
+      toast(t(resolving ? 'toast_done' : 'toast_reopen', { w: t('ward') + ' ' + (w ? w.id : tk.ward), s: nf(wardRisk(w).score, 1) }));
     } catch (err) { showBackendError(true); }
   });
 
@@ -1541,7 +1567,7 @@ function bind() {
 }
 
 /* =====================================================================
-   BOOT
+   BOOT SEQUENCE
    ===================================================================== */
 async function boot() {
   const savedTheme = store.get('varshasync.theme');
@@ -1557,8 +1583,8 @@ async function boot() {
   applyStatic();
   renderGlossary();
   try {
-    const boot = await api('/api/bootstrap');
-    WARDS = boot.wards; RC = boot.roof_factors;
+    const bootData = await api('/api/bootstrap');
+    WARDS = bootData.wards; RC = bootData.roof_factors;
   } catch (e) { showBackendError(true); return; }
   fillFormSelects();
   renderRoofTypes();
