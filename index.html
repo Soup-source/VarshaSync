@@ -504,7 +504,8 @@ const T = {
   be_err: [
     'The Python backend is not running. Open a terminal in the project folder, run python server.py and then open http://localhost:8000 in your browser.',
     'பைதான் பின்தளம் இயங்கவில்லை. திட்டக் கோப்புறையில் டெர்மினலைத் திறந்து python server.py என இயக்கி, உலாவியில் http://localhost:8000 ஐத் திறக்கவும்.',
-    'पायथन बैकएंड चालू नहीं है। प्रोजेक्ट फ़ोल्डर में टर्मिनल खोलें, python server.py चलाएँ, फिर ब्राउज़र में http://localhost:8000 खोलें।'],
+    'पायथन बैकएंड चालू नहीं है। प्रोजेक्ट फ़ोल्डर में टर्मिनल खोलें, python server.py चलाएँ, फिर ब्राउज़र में http://localhost:8000 खोलें।'
+  ],
   nav_flip: ['Sudden Weather Flip', 'திடீர் வானிலை மாற்றம்', 'अचानक मौसम पलटना'],
   nav_dirty: ['Dirty Water Alert', 'அசுத்த நீர் எச்சரிக்கை', 'गंदे पानी की चेतावनी'],
   nav_guide: ['Monsoon Checklist', 'பருவமழை சரிபார்ப்புப் பட்டியல்', 'मानसून चेकलिस्ट'],
@@ -802,7 +803,7 @@ const wardName = w => w.name[lang] || w.name.en;
 /* =====================================================================
    BACKEND CALLS (Python does ALL calculations in server.py / engine.py)
    ===================================================================== */
-async function api(path, body) {
+path, body) {
   const res = await fetch(path, body === undefined ? {} : {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   });
@@ -822,27 +823,25 @@ let reqId = 0;
 async function refresh(fromSlider) {
   const my = ++reqId;
   try {
-    const out = await api('/api/analyze', { input: state.input, tank: state.tank });
+    let out;
+    if (state.scenario === 'live') {
+      // Preserve live weather telemetry and update with current tank state
+      out = await api('/api/live', {
+        lat: state.lat || 13.08,
+        lon: state.lon || 80.27,
+        tank: state.tank
+      });
+    } else {
+      out = await api('/api/analyze', { input: state.input, tank: state.tank });
+    }
     if (my !== reqId) return;
     calc = out;
     showBackendError(false);
     renderAll(fromSlider);
-  } catch (e) { showBackendError(true); }
+  } catch (e) {
+    showBackendError(true);
+  }
 }
-
-/* Read-only views of Python backend results */
-const metrics = () => calc.metrics;
-const wardCalc = w => calc.wards.find(x => x.id === w.id);
-const wardRisk = w => wardCalc(w);
-const complaints = w => wardCalc(w).complaints;
-const advisoryWards = () => WARDS.wards.filter(w => calc.advisory.includes(w.id));
-const riskClass = s => (s > 70 ? 'crit' : s >= 40 ? 'mod' : 'safe');
-const SEV_STYLE = {
-  crit: { bg: 'var(--crit-bg)', fg: 'var(--crit)' },
-  high: { bg: 'var(--warn-bg)', fg: 'var(--warn)' },
-  med: { bg: 'var(--soft)', fg: 'var(--rain)' },
-  low: { bg: 'var(--ok-bg)', fg: 'var(--ok)' }
-};
 
 /* =====================================================================
    TOAST
@@ -1340,8 +1339,21 @@ function handleLiveLocation() {
     async (pos) => {
       const { latitude, longitude } = pos.coords;
       $('#mapCoordsDisplay').textContent = `Lat: ${latitude.toFixed(3)}, Lon: ${longitude.toFixed(3)}`;
+      
+      // Store coordinates and lock scenario state to live
+      state.lat = latitude;
+      state.lon = longitude;
+      state.scenario = 'live';
+
+      // Visually un-press any demo scenario buttons
+      $$('#scenarios .scbtn').forEach(b => b.setAttribute('aria-pressed', 'false'));
+
       try {
-        const out = await api('/api/live', { lat: latitude, lon: longitude });
+        const out = await api('/api/live', { 
+          lat: latitude, 
+          lon: longitude,
+          tank: state.tank 
+        });
         calc = out;
         if (out.dynamic_wards && out.dynamic_wards.length > 0) {
           WARDS.wards = out.dynamic_wards;

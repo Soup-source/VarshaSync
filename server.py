@@ -260,7 +260,13 @@ def analyze_live(data: dict) -> dict:
     lat = float(data.get("lat", 13.08))
     lon = float(data.get("lon", 80.27))
 
-    # True Live API: Fetches the preceding 14 days up to today's live precipitation
+    # Read dynamic tank parameters from frontend sliders (with defaults)
+    tank_cfg = data.get("tank", {})
+    roof_area = float(tank_cfg.get("roof", 120))
+    occupants = int(tank_cfg.get("people", 4))
+    tank_cap = float(tank_cfg.get("cap", 3000))
+
+    # True Live API: Fetches preceding 14 days up to today's live precipitation
     url = (
         f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}"
         f"&past_days=14&forecast_days=1&daily=precipitation_sum,temperature_2m_max&timezone=auto"
@@ -279,7 +285,6 @@ def analyze_live(data: dict) -> dict:
             custom_series = [{"p": round(p, 2), "t": round(t, 1)} for p, t in zip(p_list, t_list)]
     except Exception as e:
         print(f"[Warning] Live weather fetch failed ({e}). Defaulting to current fair-weather baseline.")
-        # Realistic fair-weather fallback (clear skies, dry ground, normal temps)
         custom_series = [{"p": 0.0, "t": 32.5} for _ in range(14)]
         custom_series.append({"p": 0.0, "t": 33.0})
 
@@ -306,7 +311,10 @@ def analyze_live(data: dict) -> dict:
         ]
 
     calc_wards = ward_scores(surge, dynamic_wards)
-    a = engine.autonomy(120, surge, engine.RUNOFF["concrete"], 4, 3000)
+    
+    # Calculate autonomy dynamically with slider values
+    runoff_coeff = engine.RUNOFF.get("concrete", 0.85) if hasattr(engine, 'RUNOFF') and isinstance(engine.RUNOFF, dict) else 0.85
+    a = engine.autonomy(roof_area, surge, runoff_coeff, occupants, tank_cap)
 
     return {
         "series": custom_series,
@@ -327,8 +335,7 @@ def analyze_live(data: dict) -> dict:
         },
         "tickets": rank_tickets(surge, dynamic_wards),
     }
-
-
+    
 def run_backtest(data: dict) -> dict:
     place = str(data.get("place", "Chennai")).strip()
     start_date = str(data.get("start", "2023-11-01")).strip()
