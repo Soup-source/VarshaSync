@@ -1,0 +1,86 @@
+{
+  "meta": {
+    "title": "VarshaSync demo wards (fictional neighbourhoods for demonstration)",
+    "note": "baseline_chokes = standing citizen-reported drain choke points from the last survey. seed_open_reports = tickets already open in the demo ledger, so engine.py matches the dashboard exactly.",
+    "elevation_reference": "metres above mean sea level",
+    "low_lying_rule": "low_lying is true when the ward sits below 5 m elevation"
+  },
+  "wards": [
+    {
+      "id": 1,
+      "name": { "en": "Riverbank Flats", "ta": "ஆற்றங்கரை குடியிருப்பு", "hi": "नदी किनारा बस्ती" },
+      "elevation_m": 2.1,
+      "low_lying": true,
+      "population": 18400,
+      "drainage": { "type": "open_channel", "length_km": 6.4, "capacity_mm_per_hr": 25, "last_desilted_months_ago": 14 },
+      "baseline_chokes": 4,
+      "seed_open_reports": 1,
+      "choke_points": [
+        { "location": "Bridge-side culvert", "issue": "Plastic and silt" },
+        { "location": "Canal bend near the pump house", "issue": "Silt build-up" },
+        { "location": "Lane 3 outfall", "issue": "Broken grate" },
+        { "location": "Riverside road gully", "issue": "Leaf litter" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": { "en": "Market Junction", "ta": "சந்தை சந்திப்பு", "hi": "बाज़ार चौराहा" },
+      "elevation_m": 8.4,
+      "low_lying": false,
+      "population": 24100,
+      "drainage": { "type": "covered_drain", "length_km": 4.8, "capacity_mm_per_hr": 40, "last_desilted_months_ago": 8 },
+      "baseline_chokes": 3,
+      "seed_open_reports": 1,
+      "choke_points": [
+        { "location": "Vegetable market back lane", "issue": "Food waste" },
+        { "location": "Bus stand inlet", "issue": "Plastic bags" },
+        { "location": "Temple street gully", "issue": "Cement debris" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": { "en": "Hill Park Heights", "ta": "மலைப்பூங்கா உயரம்", "hi": "हில் பார்க் ஹைட்ஸ்" },
+      "elevation_m": 21.6,
+      "low_lying": false,
+      "population": 12800,
+      "drainage": { "type": "storm_sewer", "length_km": 3.9, "capacity_mm_per_hr": 55, "last_desilted_months_ago": 5 },
+      "baseline_chokes": 1,
+      "seed_open_reports": 0,
+      "choke_points": [
+        { "location": "Park entrance inlet", "issue": "Leaf litter" }
+      ]
+    },
+    {
+      "id": 4,
+      "name": { "en": "Old Town Lanes", "ta": "பழைய நகர சந்துகள்", "hi": "पुराना शहर की गलियाँ" },
+      "elevation_m": 3.0,
+      "low_lying": true,
+      "population": 21700,
+      "drainage": { "type": "combined_sewer", "length_km": 5.6, "capacity_mm_per_hr": 20, "last_desilted_months_ago": 19 },
+      "baseline_chokes": 6,
+      "seed_open_reports": 1,
+      "choke_points": [
+        { "location": "Weavers lane manhole", "issue": "Sewage backflow" },
+        { "location": "Well street junction", "issue": "Silt and plastic" },
+        { "location": "Old school road", "issue": "Collapsed pipe section" },
+        { "location": "Fish market gully", "issue": "Waste" },
+        { "location": "Mosque lane inlet", "issue": "Silt" },
+        { "location": "Pump street outfall", "issue": "Blocked outlet" }
+      ]
+    },
+    {
+      "id": 5,
+      "name": { "en": "Lakeview Layout", "ta": "ஏரிக்காட்சி நகர்", "hi": "झील दृश्य कॉलोनी" },
+      "elevation_m": 6.2,
+      "low_lying": false,
+      "population": 15300,
+      "drainage": { "type": "open_channel", "length_km": 4.1, "capacity_mm_per_hr": 30, "last_desilted_months_ago": 10 },
+      "baseline_chokes": 2,
+      "seed_open_reports": 1,
+      "choke_points": [
+        { "location": "Lake feeder channel", "issue": "Weeds" },
+        { "location": "Park Avenue gully", "issue": "Plastic bags" }
+      ]
+    }
+  ]
+}

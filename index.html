@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VarshaSync (RainShift) - Rain and Water Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eef3f1; --card:#ffffff; --ink:#0f2a35; --muted:#4f6670; --line:#d3e0dc; --soft:#e6efec;
+  --brand:#1f7a5a; --brand-ink:#ffffff; --rain:#2f8fc4; --dry:#c8892b; --crit:#c2362f; --warn:#b9770e; --ok:#1f7a5a;
+  --crit-bg:#fbe9e7; --warn-bg:#fcf1de; --ok-bg:#e1f3ea; --focus:#0b63a8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#08171d; --card:#0f2630; --ink:#e6f1ee; --muted:#9db6bd; --line:#21424d; --soft:#14323d;
+    --brand:#3ec79a; --brand-ink:#04241a; --rain:#5bb8e8; --dry:#e4a948; --crit:#ff7b72; --warn:#f0b04a; --ok:#4fd3a3;
+    --crit-bg:#3a1a1b; --warn-bg:#3a2c12; --ok-bg:#10342a; --focus:#7cc4f4;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#08171d; --card:#0f2630; --ink:#e6f1ee; --muted:#9db6bd; --line:#21424d; --soft:#14323d;
+  --brand:#3ec79a; --brand-ink:#04241a; --rain:#5bb8e8; --dry:#e4a948; --crit:#ff7b72; --warn:#f0b04a; --ok:#4fd3a3;
+  --crit-bg:#3a1a1b; --warn-bg:#3a2c12; --ok-bg:#10342a; --focus:#7cc4f4;
+}
+html{height:100%;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 120px);scroll-behavior:smooth}
+body{min-height:100%;margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Figtree','Noto Sans Tamil','Noto Sans Devanagari',system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+html[lang="ta"] body,html[lang="hi"] body{line-height:1.75}
+h1,h2,h3,.display{font-family:'Bricolage Grotesque','Noto Sans Tamil','Noto Sans Devanagari',system-ui,sans-serif;letter-spacing:-.01em}
+html[lang="ta"] h1,html[lang="ta"] h2,html[lang="ta"] h3,html[lang="hi"] h1,html[lang="hi"] h2,html[lang="hi"] h3{letter-spacing:0}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:8px}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+
+/* Surfaces */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px}
+.soft{background:var(--soft);border-radius:14px}
+.muted{color:var(--muted)}
+.hint{background:var(--soft);border-left:4px solid var(--rain);border-radius:10px;padding:12px 14px}
+.hint b{display:block;margin-bottom:2px}
+
+/* Sticky header */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;padding-top:6px;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line)}
+.langgrp{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:3px}
+.langgrp button{border:0;background:transparent;padding:7px 14px;border-radius:999px;font-weight:600;min-height:40px}
+.langgrp button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+.iconbtn{border:1px solid var(--line);background:var(--soft);border-radius:999px;width:44px;height:44px;display:grid;place-items:center}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:8px 0 10px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 16px;font-weight:600;min-height:44px;white-space:nowrap;transition:background .2s,color .2s,border-color .2s}
+.tab:hover{border-color:var(--brand)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* Hero */
+.hero{position:relative;overflow:hidden;color:#f2fbff;isolation:isolate;transition:background .6s}
+.hero[data-level="crit"]{background:radial-gradient(900px 340px at 85% -10%,#7f1d1d55,transparent 60%),linear-gradient(160deg,#171a3d,#0b1226 70%)}
+.hero[data-level="mod"]{background:radial-gradient(900px 340px at 85% -10%,#b4530955,transparent 60%),linear-gradient(160deg,#0c3a55,#0b2a3a 70%)}
+.hero[data-level="safe"]{background:radial-gradient(900px 340px at 85% -10%,#16a34a44,transparent 60%),linear-gradient(160deg,#0b5a52,#0a3d44 70%)}
+#wx{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.hero h1{font-weight:800;font-size:clamp(2.4rem,7vw,4.4rem);line-height:1.02}
+.scbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1.5px solid #ffffff40;background:#ffffff14;border-radius:14px;padding:12px 14px;min-height:64px;flex:1 1 180px;transition:transform .15s,background .2s,border-color .2s}
+.scbtn:hover{background:#ffffff26;transform:translateY(-2px)}
+.scbtn:active{transform:translateY(0)}
+.scbtn[aria-pressed="true"]{background:#ffffff;color:#0f2a35;border-color:#fff}
+.scbtn small{opacity:.82}
+.statuscard{background:#ffffff12;border:1px solid #ffffff2e;border-radius:22px;padding:18px;backdrop-filter:blur(6px)}
+.gauge-arc{transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1),stroke .4s}
+.herochip{background:#ffffff14;border:1px solid #ffffff26;border-radius:14px;padding:10px 14px}
+
+/* Level badges */
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 11px;font-weight:700;font-size:.85rem}
+.b-crit{background:var(--crit-bg);color:var(--crit)}
+.b-mod{background:var(--warn-bg);color:var(--warn)}
+.b-safe{background:var(--ok-bg);color:var(--ok)}
+.c-crit{color:var(--crit)} .c-mod{color:var(--warn)} .c-safe{color:var(--ok)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);padding:10px 16px;font-weight:700;min-height:44px;transition:transform .12s,background .2s,border-color .2s}
+.btn:hover{border-color:var(--brand)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.btn-primary:hover{filter:brightness(1.07)}
+.btn-danger{background:var(--crit);color:#fff;border-color:var(--crit)}
+
+/* Sliders */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:999px;background:linear-gradient(90deg,var(--rain),var(--brand));outline-offset:6px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:var(--card);border:4px solid var(--ink);box-shadow:0 2px 6px #0004;cursor:grab}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--card);border:4px solid var(--ink);cursor:grab}
+.field{width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:10px 12px;min-height:44px}
+.field:focus{border-color:var(--brand)}
+label.lbl{display:block;font-weight:700;margin-bottom:6px}
+.val{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.25rem}
+
+/* Ward tiles */
+.ward{display:flex;flex-direction:column;gap:6px;text-align:left;padding:14px;border:2px solid var(--line);border-radius:16px;background:var(--card);transition:border-color .2s,transform .15s,box-shadow .2s;min-height:150px}
+.ward:hover{transform:translateY(-3px);box-shadow:0 8px 22px #0002}
+.ward[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--ink) 18%,transparent)}
+.ward .score{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:2.4rem;line-height:1}
+.meter{height:12px;border-radius:999px;background:var(--soft);overflow:hidden}
+.meter>i{display:block;height:100%;border-radius:999px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+
+/* Advisory banner */
+.advisory{border-radius:16px;padding:16px 18px;border:2px solid}
+.advisory.on{background:var(--crit-bg);border-color:var(--crit)}
+.advisory.off{background:var(--ok-bg);border-color:var(--ok)}
+.advisory.on .pulse{animation:pulse 1.6s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--crit) 55%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+
+/* Checklist */
+.phase{border:1.5px solid var(--line);border-radius:16px;background:var(--card);padding:16px;transition:opacity .3s,filter .3s}
+.phase[data-locked="true"]{opacity:.55;filter:grayscale(.6)}
+.task{display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:12px;cursor:pointer;min-height:48px}
+.task:hover{background:var(--soft)}
+.task input{width:24px;height:24px;margin-top:2px;accent-color:var(--brand);flex:0 0 auto}
+.task input:checked + span{text-decoration:line-through;color:var(--muted)}
+.stagebtn{flex:1 1 150px;border:2px solid var(--line);background:var(--card);border-radius:14px;padding:12px;text-align:left;min-height:64px;transition:border-color .2s,background .2s}
+.stagebtn[aria-pressed="true"]{border-color:var(--ink);background:var(--soft)}
+
+/* Tank */
+.tankwater{transition:y .8s cubic-bezier(.2,.8,.2,1),height .8s cubic-bezier(.2,.8,.2,1)}
+.drop{display:inline-block;width:18px;height:24px;margin:2px;transition:opacity .3s}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-weight:600;min-height:44px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* Ledger */
+.tk{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:14px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);animation:slidein .35s ease-out}
+@keyframes slidein{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.rank{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.15rem}
+.tk[data-done="true"]{opacity:.62}
+.qbar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--soft)}
+.qbar>i{display:block;transition:flex-grow .5s}
+
+/* Toast */
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translate(-50%,30px);opacity:0;pointer-events:none;z-index:80;
+  background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:600;max-width:min(92vw,460px);text-align:center;transition:opacity .25s,transform .25s;box-shadow:0 10px 30px #0006}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* Misc */
+.gl{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--card)}
+.panel[hidden]{display:none}
+.scroll-x{overflow-x:auto}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ Sticky top bar: brand, languages, theme, module tabs ============ -->
+<div class="topbar">
+  <div class="mx-auto max-w-6xl px-4">
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 min-w-0">
+        <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C16 3 6 14 6 20a10 10 0 0 0 20 0C26 14 16 3 16 3Z" fill="var(--rain)"/><path d="M11 21a5 5 0 0 0 5 5" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+        <span class="display font-extrabold text-xl truncate">VarshaSync</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" class="btn btn-primary" id="locBtn" style="min-height:36px;padding:6px 14px;font-size:0.85rem">
+          <span data-i18n="loc_btn">📍 Use My Location</span>
+        </button>
+        <div class="langgrp" role="group" aria-label="Language">
+          <button type="button" data-lang="en" aria-pressed="true">EN</button>
+          <button type="button" data-lang="ta" aria-pressed="false">தமிழ்</button>
+          <button type="button" data-lang="hi" aria-pressed="false">हिन्दी</button>
+        </div>
+        <button type="button" class="iconbtn" id="themeBtn" aria-label="Switch light or dark" data-i18n-aria="theme_btn">
+          <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Modules" id="tabs">
+      <button class="tab" role="tab" id="tab-flip" aria-controls="panel-flip" aria-selected="true" data-tab="flip" data-i18n="nav_flip"></button>
+      <button class="tab" role="tab" id="tab-dirty" aria-controls="panel-dirty" aria-selected="false" data-tab="dirty" data-i18n="nav_dirty"></button>
+      <button class="tab" role="tab" id="tab-guide" aria-controls="panel-guide" aria-selected="false" data-tab="guide" data-i18n="nav_guide"></button>
+      <button class="tab" role="tab" id="tab-tank" aria-controls="panel-tank" aria-selected="false" data-tab="tank" data-i18n="nav_tank"></button>
+      <button class="tab" role="tab" id="tab-report" aria-controls="panel-report" aria-selected="false" data-tab="report" data-i18n="nav_report"></button>
+    </div>
+  </div>
+</div>
+
+<div id="backendErr" hidden role="alert" style="background:var(--crit-bg);color:var(--crit);border-bottom:2px solid var(--crit);padding:14px 16px;font-weight:600;text-align:center" data-i18n="be_err"></div>
+
+<!-- ============ Hero ============ -->
+<header class="hero" id="hero" data-level="crit">
+  <canvas id="wx" aria-hidden="true"></canvas>
+  <div class="mx-auto max-w-6xl px-4 pt-10 pb-8">
+    <div class="grid lg:grid-cols-5 gap-8 items-center">
+      <div class="lg:col-span-3">
+        <h1>VarshaSync</h1>
+        <p class="display text-xl sm:text-2xl mt-3 font-semibold" data-i18n="app_tag"></p>
+        <p class="mt-2 max-w-xl opacity-90" data-i18n="hero_kicker"></p>
+        <p class="mt-7 mb-2 font-semibold" data-i18n="demo_try"></p>
+        <div class="flex flex-wrap gap-3" id="scenarios">
+          <button type="button" class="scbtn" data-sc="whiplash" aria-pressed="true"><b data-i18n="sc_whiplash"></b><small data-i18n="sc_whiplash_d"></small></button>
+          <button type="button" class="scbtn" data-sc="base" aria-pressed="false"><b data-i18n="sc_base"></b><small data-i18n="sc_base_d"></small></button>
+          <button type="button" class="scbtn" data-sc="gutter" aria-pressed="false"><b data-i18n="sc_gutter"></b><small data-i18n="sc_gutter_d"></small></button>
+        </div>
+      </div>
+      <div class="lg:col-span-2">
+        <div class="statuscard" aria-live="polite">
+          <div class="font-semibold opacity-90" data-i18n="st_today"></div>
+          <div class="flex justify-center mt-1">
+            <svg viewBox="0 0 200 122" class="w-full" style="max-width:290px" role="img" aria-labelledby="gaugeTitle">
+              <title id="gaugeTitle">Weather flip score</title>
+              <path d="M10 100 A90 90 0 0 1 190 100" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="16" stroke-linecap="round"/>
+              <path id="gaugeArc" class="gauge-arc" d="M10 100 A90 90 0 0 1 190 100" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round" stroke-dasharray="282.74" stroke-dashoffset="282.74"/>
+              <line x1="26.9" y1="67.5" x2="8.65" y2="59.3" stroke="rgba(255,255,255,.75)" stroke-width="2"/>
+              <line x1="60" y1="30.7" x2="50" y2="13.4" stroke="rgba(255,255,255,.75)" stroke-width="2"/>
+              <text id="gaugeNum" x="100" y="92" text-anchor="middle" fill="#fff" style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px">0</text>
+              <text id="gaugeLbl" x="100" y="114" text-anchor="middle" fill="#fff" opacity=".85" style="font-size:11px"></text>
+            </svg>
+          </div>
+          <div class="text-center">
+            <div class="display text-2xl font-extrabold" id="lvlTitle"></div>
+            <p class="mt-1 text-[0.98rem] opacity-95" id="lvlMsg"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-8">
+      <div class="herochip"><div class="text-sm opacity-85" data-i18n="chip_rain"></div><div class="display text-2xl font-extrabold" id="chipRain"></div></div>
+      <div class="herochip"><div class="text-sm opacity-85" data-i18n="chip_dry"></div><div class="display text-2xl font-extrabold" id="chipDry"></div></div>
+      <div class="herochip"><div class="text-sm opacity-85" data-i18n="chip_wards"></div><div class="display text-2xl font-extrabold" id="chipWards"></div></div>
+      <div class="herochip"><div class="text-sm opacity-85" data-i18n="chip_pending"></div><div class="display text-2xl font-extrabold" id="chipPending"></div></div>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-6xl px-4 py-8">
+
+<!-- ================= Module 1: Sudden weather flip ================= -->
+<section class="panel" id="panel-flip" role="tabpanel" aria-labelledby="tab-flip">
+  <div class="mb-5">
+    <h2 class="text-3xl font-extrabold" data-i18n="nav_flip"></h2>
+    <p class="muted mt-1"><span data-i18n="sci_name"></span>: <span data-i18n="m1_sci_val"></span></p>
+  </div>
+  <div class="hint mb-6"><b data-i18n="simple_words"></b><span data-i18n="m1_simple"></span></div>
+
+  <div class="grid lg:grid-cols-5 gap-6">
+    <div class="card p-5 lg:col-span-3">
+      <h3 class="text-xl font-bold mb-3" data-i18n="m1_chart"></h3>
+      <div style="position:relative;height:310px"><canvas id="rainChart" role="img" aria-label="Rain and temperature chart"></canvas></div>
+      <div class="flex flex-wrap gap-x-5 gap-y-2 mt-3 text-sm">
+        <span class="inline-flex items-center gap-2"><i style="width:14px;height:14px;border-radius:4px;background:var(--dry);display:inline-block"></i><span data-i18n="key_dry"></span></span>
+        <span class="inline-flex items-center gap-2"><i style="width:14px;height:14px;border-radius:4px;background:var(--crit);display:inline-block"></i><span data-i18n="key_storm"></span></span>
+        <span class="inline-flex items-center gap-2"><i style="width:14px;height:14px;border-radius:4px;background:var(--rain);display:inline-block;opacity:.6"></i><span data-i18n="key_other"></span></span>
+      </div>
+    </div>
+
+    <div class="lg:col-span-2 flex flex-col gap-6">
+      <div class="card p-5">
+        <div class="mb-5">
+          <div class="flex justify-between items-baseline gap-3">
+            <label class="lbl mb-0" for="inDry" data-i18n="m1_dry"></label>
+            <span class="val" id="outDry"></span>
+          </div>
+          <input type="range" id="inDry" min="0" max="10" step="0.1" value="0.2" class="mt-3">
+        </div>
+        <div>
+          <div class="flex justify-between items-baseline gap-3">
+            <label class="lbl mb-0" for="inSurge" data-i18n="m1_surge"></label>
+            <span class="val" id="outSurge"></span>
+          </div>
+          <input type="range" id="inSurge" min="0" max="150" step="0.5" value="94.5" class="mt-3">
+        </div>
+        <p class="muted text-sm mt-4" data-i18n="m1_slide_hint"></p>
+      </div>
+
+      <div class="card p-5">
+        <div class="flex justify-between items-baseline gap-3">
+          <h3 class="font-bold" data-i18n="m1_soak"></h3>
+          <span class="val" id="soakPct"></span>
+        </div>
+        <div class="meter mt-2" style="height:18px"><i id="soakBar" style="background:var(--rain);width:0"></i></div>
+        <div class="flex justify-between text-sm mt-1 muted"><span data-i18n="m1_soak_in"></span><span data-i18n="m1_runoff"></span></div>
+        <p class="muted text-sm mt-2" data-i18n="m1_soak_note"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6 mt-6">
+    <div class="card p-5">
+      <h3 class="font-bold mb-2" data-i18n="m1_formula"></h3>
+      <p data-i18n="m1_formula_txt"></p>
+      <div class="soft p-3 mt-3 display font-bold text-lg" id="formulaLive"></div>
+    </div>
+    <div class="card p-5">
+      <h3 class="font-bold mb-3" data-i18n="m1_bands"></h3>
+      <div class="flex flex-col gap-2" id="bands">
+        <div class="badge b-crit justify-between" data-band="crit"><span data-i18n="m1_band_c"></span><span data-i18n="m1_band_c_d"></span></div>
+        <div class="badge b-mod justify-between" data-band="mod"><span data-i18n="m1_band_m"></span><span data-i18n="m1_band_m_d"></span></div>
+        <div class="badge b-safe justify-between" data-band="safe"><span data-i18n="m1_band_s"></span><span data-i18n="m1_band_s_d"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Module 2: Dirty water alert ================= -->
+<section class="panel" id="panel-dirty" role="tabpanel" aria-labelledby="tab-dirty" hidden>
+  <div class="mb-5">
+    <h2 class="text-3xl font-extrabold" data-i18n="nav_dirty"></h2>
+    <p class="muted mt-1"><span data-i18n="sci_name"></span>: <span data-i18n="m2_sci_val"></span></p>
+  </div>
+  <div class="hint mb-6"><b data-i18n="simple_words"></b><span data-i18n="m2_simple"></span></div>
+
+  <!-- Live Location Radar Map Card -->
+  <div class="card p-5 mb-6" id="mapCard">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-xl font-bold" data-i18n="map_title"></h3>
+      <span class="badge b-safe" id="locStatusBadge">Ready</span>
+    </div>
+    <div id="mapContainer" class="soft relative overflow-hidden" style="height:250px;border-radius:14px;border:1px solid var(--line)">
+      <canvas id="liveRadarCanvas" style="width:100%;height:100%"></canvas>
+      <div class="absolute bottom-3 left-3 herochip text-xs" id="mapCoordsDisplay" style="background:var(--card);color:var(--ink)">
+        GPS: Ready
+      </div>
+    </div>
+  </div>
+
+  <div id="advisory" class="advisory mb-6" aria-live="polite"></div>
+
+  <p class="muted mb-3" data-i18n="w_how"></p>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="wardGrid"></div>
+
+  <div class="card p-5 mt-6" id="wardDetail"></div>
+</section>
+
+<!-- ================= Module 3: Monsoon checklist ================= -->
+<section class="panel" id="panel-guide" role="tabpanel" aria-labelledby="tab-guide" hidden>
+  <div class="mb-5">
+    <h2 class="text-3xl font-extrabold" data-i18n="nav_guide"></h2>
+    <p class="muted mt-1"><span data-i18n="sci_name"></span>: <span data-i18n="m3_sci_val"></span></p>
+  </div>
+  <div class="hint mb-6"><b data-i18n="simple_words"></b><span data-i18n="m3_simple"></span></div>
+
+  <div class="card p-5 mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+      <h3 class="font-bold text-lg" data-i18n="m3_where"></h3>
+      <button type="button" class="btn" id="resetChecks" data-i18n="m3_reset"></button>
+    </div>
+    <div class="flex flex-wrap gap-3" id="stageBtns"></div>
+    <div class="mt-5">
+      <div class="flex justify-between font-semibold mb-1"><span data-i18n="m3_progress"></span><span id="overallPct"></span></div>
+      <div class="meter" style="height:16px"><i id="overallBar" style="background:var(--brand);width:0"></i></div>
+    </div>
+  </div>
+  <div class="grid lg:grid-cols-3 gap-5" id="phases"></div>
+</section>
+
+<!-- ================= Module 4: Saved rainwater ================= -->
+<section class="panel" id="panel-tank" role="tabpanel" aria-labelledby="tab-tank" hidden>
+  <div class="mb-5">
+    <h2 class="text-3xl font-extrabold" data-i18n="nav_tank"></h2>
+    <p class="muted mt-1"><span data-i18n="sci_name"></span>: <span data-i18n="m4_sci_val"></span></p>
+  </div>
+  <div class="hint mb-6"><b data-i18n="simple_words"></b><span data-i18n="m4_simple"></span></div>
+
+  <div class="grid lg:grid-cols-5 gap-6">
+    <div class="card p-5 lg:col-span-3 flex flex-col gap-5">
+      <div>
+        <div class="flex justify-between items-baseline gap-3"><label class="lbl mb-0" for="tkRoof" data-i18n="m4_roof"></label><span class="val" id="tkRoofV"></span></div>
+        <input type="range" id="tkRoof" min="10" max="500" step="5" value="120" class="mt-3">
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline gap-3"><label class="lbl mb-0" for="tkRain" data-i18n="m4_rain"></label><span class="val" id="tkRainV"></span></div>
+        <input type="range" id="tkRain" min="0" max="300" step="1" value="60" class="mt-3">
+        <button type="button" class="btn mt-3" id="useStorm" data-i18n="m4_use_storm"></button>
+      </div>
+      <div>
+        <div class="lbl" data-i18n="m4_roof_type"></div>
+        <div class="flex flex-wrap gap-2" id="roofTypes" role="group"></div>
+        <p class="muted text-sm mt-2" data-i18n="m4_rc_help"></p>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline gap-3"><label class="lbl mb-0" for="tkOcc" data-i18n="m4_occ"></label><span class="val" id="tkOccV"></span></div>
+        <input type="range" id="tkOcc" min="1" max="20" step="1" value="4" class="mt-3">
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline gap-3"><label class="lbl mb-0" for="tkCap" data-i18n="m4_cap"></label><span class="val" id="tkCapV"></span></div>
+        <input type="range" id="tkCap" min="500" max="20000" step="100" value="3000" class="mt-3">
+      </div>
+      <p class="muted text-sm" data-i18n="m1_note_mm"></p>
+    </div>
+
+    <div class="lg:col-span-2 flex flex-col gap-6">
+      <div class="card p-5 text-center">
+        <svg viewBox="0 0 160 200" class="mx-auto" style="max-width:190px" role="img" aria-label="Water tank">
+          <defs>
+            <clipPath id="tankClip"><rect x="24" y="24" width="112" height="152" rx="12"/></clipPath>
+            <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--rain)"/><stop offset="1" stop-color="var(--brand)"/></linearGradient>
+          </defs>
+          <rect x="20" y="20" width="120" height="160" rx="16" fill="var(--soft)" stroke="var(--ink)" stroke-width="4"/>
+          <g clip-path="url(#tankClip)"><rect id="tankWater" class="tankwater" x="24" y="176" width="112" height="0" fill="url(#wg)"/></g>
+          <text id="tankPct" x="80" y="108" text-anchor="middle" fill="var(--ink)" style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;paint-order:stroke;stroke:var(--card);stroke-width:4px">0%</text>
+        </svg>
+        <div class="muted font-semibold" data-i18n="m4_last"></div>
+        <div class="display font-extrabold" style="font-size:3.4rem;line-height:1.05" id="daysOut"></div>
+        <div class="flex flex-wrap justify-center mt-2" id="drops" aria-hidden="true"></div>
+      </div>
+      <div class="card p-5">
+        <dl class="grid grid-cols-1 gap-3">
+          <div class="flex justify-between gap-3"><dt class="muted" data-i18n="m4_collect"></dt><dd class="val" id="outYield"></dd></div>
+          <div class="flex justify-between gap-3"><dt class="muted" data-i18n="m4_use"></dt><dd class="val" id="outDaily"></dd></div>
+          <div class="flex justify-between gap-3"><dt class="muted" data-i18n="m4_stored"></dt><dd class="val" id="outStored"></dd></div>
+        </dl>
+        <div class="soft p-3 mt-4 font-semibold" id="tankNote"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card p-5 mt-6">
+    <h3 class="font-bold mb-2" data-i18n="m1_formula"></h3>
+    <p data-i18n="m4_formula_txt"></p>
+  </div>
+</section>
+
+<!-- ================= Module 5: Report a problem ================= -->
+<section class="panel" id="panel-report" role="tabpanel" aria-labelledby="tab-report" hidden>
+  <div class="mb-5">
+    <h2 class="text-3xl font-extrabold" data-i18n="nav_report"></h2>
+    <p class="muted mt-1"><span data-i18n="sci_name"></span>: <span data-i18n="m5_sci_val"></span></p>
+  </div>
+  <div class="hint mb-6"><b data-i18n="simple_words"></b><span data-i18n="m5_simple"></span></div>
+
+  <div class="grid lg:grid-cols-5 gap-6">
+    <div class="card p-5 lg:col-span-2 self-start">
+      <div class="display font-bold text-xl mb-4" data-i18n="f_title"></div>
+      <div id="reportForm" class="flex flex-col gap-4">
+        <div><label class="lbl" for="fType" data-i18n="f_type"></label><select id="fType" class="field"></select></div>
+        <div><label class="lbl" for="fWard" data-i18n="f_ward"></label><select id="fWard" class="field"></select></div>
+        <div><label class="lbl" for="fPeople" data-i18n="f_people"></label><input id="fPeople" type="number" min="1" max="5000" value="10" class="field" inputmode="numeric"></div>
+        <div><label class="lbl" for="fDesc" data-i18n="f_desc"></label><textarea id="fDesc" rows="3" class="field" data-i18n-ph="f_desc_ph" maxlength="300"></textarea></div>
+        <button type="button" class="btn btn-primary" id="fSubmit" data-i18n="f_submit"></button>
+        <p class="text-sm" style="color:var(--crit)" id="fError" role="alert"></p>
+      </div>
+    </div>
+
+    <div class="lg:col-span-3 flex flex-col gap-4">
+      <div class="card p-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h3 class="display font-bold text-xl" data-i18n="l_title"></h3>
+          <div class="flex gap-2" id="filters" role="group">
+            <button type="button" class="chip" data-f="all" aria-pressed="true"></button>
+            <button type="button" class="chip" data-f="pending" aria-pressed="false"></button>
+            <button type="button" class="chip" data-f="resolved" aria-pressed="false"></button>
+          </div>
+        </div>
+        <div class="qbar mt-4" id="qbar" aria-hidden="true"></div>
+        <div class="flex flex-wrap gap-2 mt-3" id="qlegend"></div>
+        <p class="muted text-sm mt-3" data-i18n="l_why"></p>
+      </div>
+      <div class="flex flex-col gap-3" id="ledger" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Glossary ================= -->
+<section class="mt-12" aria-labelledby="glTitle">
+  <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+    <div>
+      <h2 class="text-2xl font-extrabold" id="glTitle" data-i18n="gl_title"></h2>
+      <p class="muted" data-i18n="gl_sub"></p>
+    </div>
+    <input type="search" id="glSearch" class="field" style="max-width:300px" data-i18n-ph="gl_search" aria-label="Search words">
+  </div>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" id="glossary"></div>
+</section>
+
+<footer class="mt-12 pt-6 pb-4 border-t text-sm muted" style="border-color:var(--line)">
+  <p data-i18n="foot_sources"></p>
+  <p class="mt-2" data-i18n="foot_demo"></p>
+</footer>
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* =====================================================================
+   DATA: Handled strictly via Python backend (server.py)
+   ===================================================================== */
+let WARDS = { wards: [] };
+let RC = {};
+let calc = null;
+
+/* =====================================================================
+   TRANSLATIONS [English, Tamil, Hindi]
+   ===================================================================== */
+const LANGS = ['en', 'ta', 'hi'];
+const T = {
+  theme_btn: ['Switch light or dark', 'ஒளி/இருள் தீம் மாற்று', 'लाइट या डार्क बदलें'],
+  be_err: [
+    'The Python backend is not running. Open a terminal in the project folder, run python server.py and then open http://localhost:8000 in your browser.',
+    'பைதான் பின்தளம் இயங்கவில்லை. திட்டக் கோப்புறையில் டெர்மினலைத் திறந்து python server.py என இயக்கி, உலாவியில் http://localhost:8000 ஐத் திறக்கவும்.',
+    'पायथन बैकएंड चालू नहीं है। प्रोजेक्ट फ़ोल्डर में टर्मिनल खोलें, python server.py चलाएँ, फिर ब्राउज़र में http://localhost:8000 खोलें।'],
+  nav_flip: ['Sudden Weather Flip', 'திடீர் வானிலை மாற்றம்', 'अचानक मौसम पलटना'],
+  nav_dirty: ['Dirty Water Alert', 'அசுத்த நீர் எச்சரிக்கை', 'गंदे पानी की चेतावनी'],
+  nav_guide: ['Monsoon Checklist', 'பருவமழை சரிபார்ப்புப் பட்டியல்', 'मानसून चेकलिस्ट'],
+  nav_tank: ['Saved Rainwater', 'சேமித்த மழைநீர்', 'बचाया हुआ बारिश का पानी'],
+  nav_report: ['Report a Problem', 'புகார் அளிக்க', 'समस्या बताएँ'],
+  sci_name: ['Scientific name', 'அறிவியல் பெயர்', 'वैज्ञानिक नाम'],
+  simple_words: ['In simple words', 'எளிய சொற்களில்', 'आसान शब्दों में'],
+
+  loc_btn: ['📍 Use My Location', '📍 என் இருப்பிடம்', '📍 मेरा स्थान'],
+  map_title: ['Live Location Radar & Ward Map', 'நேரலை இருப்பிட ரேடார் & வரைபடம்', 'लाइव स्थान रडार और वार्ड नक्शा'],
+  loc_fetching: ['Accessing GPS & Weather API…', 'ஜிபிஎஸ் மற்றும் வானிலை தகவல் பெறப்படுகிறது…', 'जीपीएस और मौसम डेटा प्राप्त हो रहा है…'],
+  loc_err: ['Could not get location. Check browser permissions.', 'இருப்பிடத்தைப் பெற முடியவில்லை. அனுமதிகளைச் சரிபார்க்கவும்.', 'स्थान नहीं मिला। ब्राउज़र अनुमति जाँचें।'],
+
+  app_tag: ['Know the rain. Protect your water.', 'மழையை அறிவோம். நீரைப் பாதுகாப்போம்.', 'बारिश को समझें, पानी को बचाएँ।'],
+  hero_kicker: ['A simple rain and water guide for your neighbourhood.', 'உங்கள் பகுதிக்கான எளிய மழை மற்றும் நீர் வழிகாட்டி.', 'आपके मोहल्ले के लिए बारिश और पानी की आसान गाइड।'],
+  demo_try: ['Try a demo situation', 'ஒரு மாதிரி நிலையை முயற்சிக்கவும்', 'एक डेमो स्थिति आज़माएँ'],
+  sc_whiplash: ['Whiplash Event', 'திடீர் மாற்ற நிகழ்வு', 'व्हिपलैश घटना'],
+  sc_whiplash_d: ['Long dry spell, then a huge downpour', 'நீண்ட வறட்சி, பின் திடீர் பெருமழை', 'लंबा सूखा, फिर अचानक मूसलाधार बारिश'],
+  sc_base: ['Baseline Rain', 'வழக்கமான மழை', 'सामान्य बारिश'],
+  sc_base_d: ['Ordinary monsoon showers', 'வழக்கமான பருவமழைத் தூறல்', 'सामान्य मानसूनी बौछारें'],
+  sc_gutter: ['Gutter Emergency', 'சாக்கடை அவசரநிலை', 'नाली आपातकाल'],
+  sc_gutter_d: ['Heavy rain and many blocked drains', 'பெருமழை, பல அடைபட்ட சாக்கடைகள்', 'तेज़ बारिश और कई जाम नालियाँ'],
+  toast_sc: ['Loaded: {n}', 'ஏற்றப்பட்டது: {n}', 'लोड हुआ: {n}'],
+
+  st_today: ['Today’s situation', 'இன்றைய நிலை', 'आज की स्थिति'],
+  st_score: ['Weather Flip Score', 'வானிலை மாற்ற மதிப்பெண்', 'मौसम पलट स्कोर'],
+  lvl_crit: ['Danger: Flood Flip', 'ஆபத்து: திடீர் வெள்ள அபாயம்', 'खतरा: बाढ़ का पलटाव'],
+  lvl_mod: ['Caution: Water May Pile Up', 'எச்சரிக்கை: தண்ணீர் தேங்கலாம்', 'सावधान: पानी जमा हो सकता है'],
+  lvl_safe: ['Normal Rain', 'வழக்கமான மழை', 'सामान्य बारिश'],
+  msg_crit: [
+    'After a long dry spell, a huge downpour is hitting hard, baked ground. Water will rush into streets instead of soaking in. Move things up high and stay away from drains.',
+    'நீண்ட வறட்சிக்குப் பிறகு, காய்ந்து இறுகிய தரையில் பெருமழை பெய்கிறது. தண்ணீர் மண்ணில் இறங்காமல் தெருக்களில் வேகமாகப் பாயும். பொருட்களை உயரமான இடத்தில் வையுங்கள்; சாக்கடைகளிலிருந்து விலகி இருங்கள்.',
+    'लंबे सूखे के बाद सख़्त, तपी ज़मीन पर भारी बारिश हो रही है। पानी ज़मीन में समाने के बजाय सड़कों पर तेज़ी से बहेगा। सामान ऊँची जगह रखें और नालों से दूर रहें।'],
+  msg_mod: [
+    'Heavy rain after some dry days. Low streets may fill with water. Keep drains clear and watch the news.',
+    'சில வறண்ட நாட்களுக்குப் பிறகு கனமழை. தாழ்வான தெருக்களில் தண்ணீர் நிரம்பலாம். சாக்கடைகளைச் சுத்தமாக வைத்து, செய்திகளைக் கவனியுங்கள்.',
+    'कुछ सूखे दिनों के बाद तेज़ बारिश। निचली गलियों में पानी भर सकता है। नालियाँ साफ़ रखें और ख़बरों पर नज़र रखें।'],
+  msg_safe: [
+    'Rain looks normal. The ground can soak it in. Keep up regular drain care.',
+    'மழை வழக்கமானதாகத் தெரிகிறது. மண் தண்ணீரை உறிஞ்சிக்கொள்ளும். சாக்கடைகளை வழக்கம்போல் பராமரியுங்கள்.',
+    'बारिश सामान्य लग रही है। ज़मीन पानी सोख लेगी। नालियों की नियमित सफ़ाई रखें।'],
+  chip_rain: ['Rain on the storm day', 'புயல் நாளில் மழை', 'तूफ़ान वाले दिन की बारिश'],
+  chip_dry: ['Average rain, 14 days before', 'முந்தைய 14 நாள் சராசரி மழை', 'पिछले 14 दिनों की औसत बारिश'],
+  chip_wards: ['Wards told to boil water', 'கொதிக்க வைக்கச் சொல்லப்பட்ட வார்டுகள்', 'उबालकर पीने की सलाह वाले वार्ड'],
+  chip_pending: ['Reports waiting', 'காத்திருக்கும் புகார்கள்', 'प्रतीक्षारत शिकायतें'],
+
+  /* Module 1 */
+  m1_sci_val: ['Hydroclimatic Whiplash', 'நீர்வானிலை திடீர் மாற்றம் (Hydroclimatic Whiplash)', 'हाइड्रो-क्लाइमेटिक व्हिपलैश (Hydroclimatic Whiplash)'],
+  m1_simple: [
+    'When many hot, dry days are followed by a sudden, very heavy rain, the hard, baked ground cannot soak the water in. It runs off into streets and drains instead, so floods come faster.',
+    'பல சூடான, வறண்ட நாட்களுக்குப் பிறகு திடீரெனப் பெருமழை பெய்தால், இறுகிய காய்ந்த தரையால் தண்ணீரை உறிஞ்ச முடியாது. அது தெருக்களிலும் சாக்கடைகளிலும் ஓடுவதால் வெள்ளம் விரைவாக வருகிறது.',
+    'जब कई गर्म, सूखे दिनों के बाद अचानक बहुत तेज़ बारिश होती है, तो सख़्त, तपी ज़मीन पानी नहीं सोख पाती। पानी सड़कों और नालों में बह जाता है, इसलिए बाढ़ जल्दी आती है।'],
+  m1_chart: ['30 days of rain and heat', '30 நாட்கள் மழை மற்றும் வெப்பம்', '30 दिनों की बारिश और गर्मी'],
+  ch_rain: ['Rain (mm)', 'மழை (மி.மீ)', 'बारिश (मिमी)'],
+  ch_temp: ['Hottest temperature (°C)', 'அதிகபட்ச வெப்பம் (°C)', 'अधिकतम तापमान (°C)'],
+  ch_day: ['Day', 'நாள்', 'दिन'],
+  key_dry: ['14 days used for the score', 'மதிப்பெண்ணுக்கான 14 நாட்கள்', 'स्कोर के लिए 14 दिन'],
+  key_storm: ['Storm day', 'புயல் நாள்', 'तूफ़ान का दिन'],
+  key_other: ['Other days', 'மற்ற நாட்கள்', 'अन्य दिन'],
+  m1_dry: ['Average daily rain, 14 days before (mm)', 'முந்தைய 14 நாள் சராசரி தினசரி மழை (மி.மீ)', 'पिछले 14 दिनों की औसत दैनिक बारिश (मिमी)'],
+  m1_surge: ['Rain on the storm day (mm)', 'புயல் நாளில் மழை (மி.மீ)', 'तूफ़ान वाले दिन की बारिश (मिमी)'],
+  m1_slide_hint: ['Drag the sliders. Every card on this page updates with you.', 'ஸ்லைடர்களை இழுக்கவும். இந்தப் பக்கத்தின் அனைத்தும் உடனே மாறும்.', 'स्लाइडर खींचें। इस पेज की हर चीज़ साथ-साथ बदलेगी।'],
+  m1_soak: ['Rain the ground can soak up', 'மண் உறிஞ்சக்கூடிய மழை', 'ज़मीन कितनी बारिश सोख सकती है'],
+  m1_soak_in: ['Soaks in', 'உறிஞ்சப்படும்', 'सोख लेती है'],
+  m1_runoff: ['Runs off', 'ஓடிவிடும்', 'बह जाता है'],
+  m1_soak_note: [
+    'Illustration only, not a measurement. Hard dry soil soaks up less, so more water runs into the streets.',
+    'விளக்கத்துக்கு மட்டும்; அளவீடு அல்ல. இறுகிய காய்ந்த மண் குறைவாகவே உறிஞ்சும்; மீதி தெருக்களில் ஓடும்.',
+    'केवल समझाने के लिए, माप नहीं। सख़्त सूखी मिट्टी कम पानी सोखती है, बाकी सड़कों पर बह जाता है।'],
+  m1_formula: ['How the score works', 'மதிப்பெண் எப்படி கணக்கிடப்படுகிறது', 'स्कोर कैसे बनता है'],
+  m1_formula_txt: [
+    'Score = rain on the storm day ÷ (average rain of the 14 days before + 1). A very dry spell makes the bottom number tiny, so the score shoots up.',
+    'மதிப்பெண் = புயல் நாளின் மழை ÷ (முந்தைய 14 நாள் சராசரி மழை + 1). வறட்சி அதிகமானால் கீழ் எண் சிறிதாகி, மதிப்பெண் உயரும்.',
+    'स्कोर = तूफ़ान वाले दिन की बारिश ÷ (पिछले 14 दिनों की औसत बारिश + 1)। जितना सूखा, नीचे की संख्या उतनी छोटी और स्कोर उतना ऊँचा।'],
+  m1_bands: ['What the score means', 'மதிப்பெண்ணின் பொருள்', 'स्कोर का मतलब'],
+  m1_band_c: ['Above 20', '20 க்கு மேல்', '20 से ऊपर'],
+  m1_band_c_d: ['Danger', 'ஆபத்து', 'खतरा'],
+  m1_band_m: ['8 to 20', '8 முதல் 20', '8 से 20'],
+  m1_band_m_d: ['Caution', 'எச்சரிக்கை', 'सावधानी'],
+  m1_band_s: ['Below 8', '8 க்குக் கீழ்', '8 से कम'],
+  m1_band_s_d: ['Normal', 'வழக்கம்', 'सामान्य'],
+  m1_note_mm: ['Handy fact: 1 mm of rain on 1 m² of roof = 1 litre of water.', 'தெரிந்துகொள்ளுங்கள்: 1 ச.மீ கூரையில் 1 மி.மீ மழை = 1 லிட்டர் தண்ணீர்.', 'काम की बात: 1 वर्ग मीटर छत पर 1 मिमी बारिश = 1 लीटर पानी।'],
+
+  /* Module 2 */
+  m2_sci_val: ['Gutter Overflow and Drinking-Water Contamination Risk', 'சாக்கடை நிரம்பல் மற்றும் குடிநீர் மாசுபாட்டு ஆபத்து', 'नाली ओवरफ़्लो और पेयजल प्रदूषण का जोखिम'],
+  m2_simple: [
+    'Heavy rain can push dirty drain water into pipes, wells and tanks. Wards with blocked drains or low ground are in more danger. A score above 70 means: boil your drinking water.',
+    'பெருமழை அசுத்தமான சாக்கடை நீரைக் குழாய்கள், கிணறுகள், தொட்டிகளுக்குள் தள்ளக்கூடும். அடைபட்ட சாக்கடை அல்லது தாழ்வான நிலம் உள்ள வார்டுகளுக்கு ஆபத்து அதிகம். மதிப்பெண் 70 க்கு மேல் என்றால்: குடிநீரைக் கொதிக்க வையுங்கள்.',
+    'तेज़ बारिश गंदे नाले का पानी पाइपों, कुओं और टंकियों में धकेल सकती है। जाम नालियों या निचली ज़मीन वाले वार्डों में ख़तरा ज़्यादा है। स्कोर 70 से ऊपर हो तो पीने का पानी उबालें।'],
+  w_how: ['Tap a ward to see why its score is high or low.', 'ஒரு வார்டை அழுத்தி, அதன் மதிப்பெண் ஏன் அப்படி என்று பாருங்கள்.', 'किसी वार्ड पर टैप करके देखें कि उसका स्कोर क्यों ऊँचा या नीचा है।'],
+  ward: ['Ward', 'வார்டு', 'वार्ड'],
+  rk_low: ['Low', 'குறைவு', 'कम'],
+  rk_watch: ['Watch', 'கவனம்', 'निगरानी'],
+  rk_high: ['High', 'அதிகம்', 'ज़्यादा'],
+  adv_title_on: ['BOIL-WATER ADVISORY', 'கொதிக்க வைத்துக் குடிக்கவும்', 'पानी उबालकर पिएँ'],
+  adv_msg_on: [
+    'Boil drinking water until it bubbles hard for 1 minute, then let it cool. Wards: {w}',
+    'குடிநீரை 1 நிமிடம் நன்றாகக் கொதிக்க வைத்து ஆறவிட்டுக் குடியுங்கள். வார்டுகள்: {w}',
+    'पीने का पानी 1 मिनट तक ज़ोर से उबालें और ठंडा करके पिएँ। वार्ड: {w}'],
+  adv_title_off: ['No boil-water advisory', 'கொதிக்க வைக்கும் எச்சரிக்கை இல்லை', 'उबालकर पीने की सलाह नहीं'],
+  adv_msg_off: [
+    'All wards are below the danger line (70). Keep watching the drains and the news.',
+    'அனைத்து வார்டுகளும் ஆபத்துக் கோட்டுக்கு (70) கீழே உள்ளன. சாக்கடைகளையும் செய்திகளையும் கவனியுங்கள்.',
+    'सभी वार्ड ख़तरे की रेखा (70) से नीचे हैं। नालियों और ख़बरों पर नज़र रखें।'],
+  copy_alert: ['Copy alert to share', 'எச்சரிக்கையைப் பகிர நகலெடு', 'शेयर करने के लिए अलर्ट कॉपी करें'],
+  copied: ['Copied!', 'நகலெடுக்கப்பட்டது!', 'कॉपी हो गया!'],
+  copy_fail: ['Could not copy. Select the text and copy it by hand.', 'நகலெடுக்க முடியவில்லை. உரையைத் தேர்ந்தெடுத்து கையால் நகலெடுக்கவும்.', 'कॉपी नहीं हो सका। टेक्स्ट चुनकर हाथ से कॉपी करें।'],
+  bd_rain: ['Rain strength', 'மழையின் வலிமை', 'बारिश की तीव्रता'],
+  bd_choke: ['Blocked drains', 'அடைபட்ட சாக்கடைகள்', 'जाम नालियाँ'],
+  bd_low: ['Low-lying ground', 'தாழ்வான நிலம்', 'निचला इलाका'],
+  bd_of: ['of', '/', 'में से'],
+  w_score_line: ['Score = 0.45 × rain + 0.35 × drains + 0.20 × low ground', 'மதிப்பெண் = 0.45 × மழை + 0.35 × சாக்கடை + 0.20 × தாழ்வு', 'स्कोर = 0.45 × बारिश + 0.35 × नाली + 0.20 × निचला इलाका'],
+  w_elev: ['Height above sea level', 'கடல் மட்டத்திலிருந்து உயரம்', 'समुद्र तल से ऊँचाई'],
+  w_low: ['Low-lying?', 'தாழ்வான பகுதியா?', 'निचला इलाका?'],
+  yes: ['Yes', 'ஆம்', 'हाँ'],
+  no: ['No', 'இல்லை', 'नहीं'],
+  w_drain: ['Drain type', 'சாக்கடை வகை', 'नाली का प्रकार'],
+  w_complaints: ['Blocked-drain complaints', 'சாக்கடை அடைப்பு புகார்கள்', 'नाली जाम की शिकायतें'],
+  w_desilt: ['Last cleaned', 'கடைசியாகச் சுத்தம்', 'आख़िरी सफ़ाई'],
+  w_months: ['{n} months ago', '{n} மாதங்களுக்கு முன்', '{n} महीने पहले'],
+  w_pop: ['People living here', 'இங்கு வசிப்பவர்கள்', 'यहाँ रहने वाले लोग'],
+  do_high: ['Boil drinking water. Keep children away from drain water. Report any overflow.', 'குடிநீரைக் கொதிக்க வையுங்கள். குழந்தைகளைச் சாக்கடை நீரிலிருந்து தள்ளி வையுங்கள். வழிதலைப் புகாரளியுங்கள்.', 'पीने का पानी उबालें। बच्चों को नाले के पानी से दूर रखें। ओवरफ़्लो की शिकायत करें।'],
+  do_watch: ['Be ready to boil water. Clear any blocked drain near you and report big blockages.', 'தண்ணீரைக் கொதிக்க வைக்கத் தயாராக இருங்கள். அருகிலுள்ள அடைப்பை அகற்றுங்கள்; பெரிய அடைப்பைப் புகாரளியுங்கள்.', 'पानी उबालने के लिए तैयार रहें। पास की जाम नाली साफ़ करें और बड़े जाम की शिकायत करें।'],
+  do_low: ['Drinking water is fine for now. Keep drains clean.', 'குடிநீர் இப்போதைக்குப் பாதுகாப்பானது. சாக்கடைகளைச் சுத்தமாக வைத்திருங்கள்.', 'फ़िलहाल पीने का पानी ठीक है। नालियाँ साफ़ रखें।'],
+  dt_open_channel: ['Open drain channel', 'திறந்த வடிகால் கால்வாய்', 'खुली नाली'],
+  dt_covered_drain: ['Covered drain', 'மூடிய வடிகால்', 'ढकी हुई नाली'],
+  dt_storm_sewer: ['Rain-water pipe network', 'மழைநீர் குழாய் அமைப்பு', 'बारिश के पानी की पाइपलाइन'],
+  dt_combined_sewer: ['Mixed sewage and rain pipe', 'கழிவுநீர் + மழைநீர் கலந்த குழாய்', 'सीवेज और बारिश का मिला पाइप'],
+
+  /* Module 3 */
+  m3_sci_val: ['Disaster Risk Reduction (DRR) Preparedness Guide, Sendai Framework', 'பேரிடர் அபாயக் குறைப்பு (DRR) தயார்நிலை வழிகாட்டி, செண்டாய் கட்டமைப்பு', 'आपदा जोखिम न्यूनीकरण (DRR) तैयारी गाइड, सेंडाई फ्रेमवर्क'],
+  m3_simple: [
+    'Three simple stages: get ready before the rains, stay safe during the rains, and clean up after. Tick each task as you finish it.',
+    'மூன்று எளிய நிலைகள்: மழைக்கு முன் தயாராகுங்கள், மழையின் போது பாதுகாப்பாக இருங்கள், மழைக்குப் பின் சுத்தம் செய்யுங்கள். ஒவ்வொரு வேலையும் முடிந்ததும் டிக் செய்யுங்கள்.',
+    'तीन आसान चरण: बारिश से पहले तैयारी, बारिश के दौरान सुरक्षा, और बारिश के बाद सफ़ाई। हर काम पूरा होने पर टिक करें।'],
+  m3_where: ['Which stage are we in?', 'நாம் எந்த நிலையில் இருக்கிறோம்?', 'अभी हम किस चरण में हैं?'],
+  ph1: ['Before the rains', 'மழைக்கு முன்', 'बारिश से पहले'],
+  ph2: ['During the rains', 'மழையின் போது', 'बारिश के दौरान'],
+  ph3: ['After the rains', 'மழைக்குப் பின்', 'बारिश के बाद'],
+  m3_locked: ['Locked until we reach this stage', 'இந்த நிலை வரும் வரை பூட்டப்பட்டுள்ளது', 'इस चरण तक पहुँचने तक बंद'],
+  m3_suggested: ['Suggested for today', 'இன்றைக்குப் பரிந்துரை', 'आज के लिए सुझाव'],
+  m3_progress: ['Your overall progress', 'உங்கள் மொத்த முன்னேற்றம்', 'आपकी कुल प्रगति'],
+  m3_reset: ['Reset checklist', 'பட்டியலை மீட்டமை', 'चेकलिस्ट रीसेट करें'],
+  m3_done: ['done', 'முடிந்தது', 'पूरा'],
+  p1a: ['Clean the drain grates near your home so water can flow (called “desilting”).', 'வீட்டருகே உள்ள சாக்கடை கம்பி மூடிகளைச் சுத்தம் செய்யுங்கள்; தண்ணீர் தடையின்றி ஓடும் (“தூர்வாருதல்”).', 'घर के पास की नाली की जालियाँ साफ़ करें ताकि पानी बहता रहे (इसे “डीसिल्टिंग” कहते हैं)।'],
+  p1b: ['Sweep dry leaves off the roof and clear the roof water-outlet pipes.', 'கூரையில் உள்ள காய்ந்த இலைகளைப் பெருக்கி, கூரை நீர் வெளியேறும் குழாய்களைச் சுத்தம் செய்யுங்கள்.', 'छत से सूखे पत्ते झाड़ें और छत के पानी निकासी पाइप साफ़ करें।'],
+  p1c: ['Check that your sump (underground water tank) cover fits tightly.', 'உங்கள் சம்ப் (தரைக்கீழ் நீர்த்தொட்டி) மூடி இறுக்கமாக உள்ளதா எனப் பாருங்கள்.', 'अपने सम्प (ज़मीन के नीचे की पानी की टंकी) का ढक्कन कसकर बंद है या नहीं, जाँचें।'],
+  p1d: ['Keep a torch, a charged phone or power bank, and basic medicines ready.', 'டார்ச் விளக்கு, சார்ஜ் செய்த போன் அல்லது பவர் பேங்க், அடிப்படை மருந்துகளைத் தயாராக வையுங்கள்.', 'टॉर्च, चार्ज किया फ़ोन या पावर बैंक और ज़रूरी दवाइयाँ तैयार रखें।'],
+  p2a: ['Stay far from waterlogged electric poles and loose wires.', 'தண்ணீர் தேங்கிய மின்கம்பங்கள், தொங்கும் கம்பிகளிலிருந்து தூரமாக இருங்கள்.', 'पानी भरे बिजली के खंभों और ढीले तारों से दूर रहें।'],
+  p2b: ['Let the first 15 minutes of roof rain run away. It washes off dust and bird droppings (“first flush”).', 'கூரையில் விழும் முதல் 15 நிமிட மழைநீரை வெளியே விட்டுவிடுங்கள்; அது தூசி, பறவைக் கழிவைக் கழுவும் (“முதல் கழுவல்”).', 'छत पर गिरने वाली पहली 15 मिनट की बारिश बहने दें। यह धूल और पक्षियों की बीट धो देती है (“फ़र्स्ट फ़्लश”)।'],
+  p2c: ['If water is rising, move documents and valuables to high shelves.', 'நீர் உயர்ந்தால் ஆவணங்கள், விலைமதிப்புள்ள பொருட்களை உயரமான அலமாரியில் வையுங்கள்.', 'पानी बढ़े तो काग़ज़ात और क़ीमती सामान ऊँची अलमारी में रखें।'],
+  p2d: ['Never walk or drive through flood water if you cannot see the road.', 'சாலை தெரியாத வெள்ள நீரில் நடக்கவோ வாகனம் ஓட்டவோ வேண்டாம்.', 'जिस बाढ़ के पानी में सड़क न दिखे, उसमें पैदल या गाड़ी से न जाएँ।'],
+  p3a: ['Clean your water tank and disinfect it with chlorine (follow the label).', 'நீர்த்தொட்டியைச் சுத்தம் செய்து, குளோரின் கொண்டு கிருமிநீக்கம் செய்யுங்கள் (லேபிள் அறிவுரைப்படி).', 'पानी की टंकी साफ़ करें और क्लोरीन से कीटाणुरहित करें (लेबल के अनुसार)।'],
+  p3b: ['Check well water. If it looks muddy or smells bad, do not drink it.', 'கிணற்று நீரைப் பாருங்கள். கலங்கலாகவோ துர்நாற்றமாகவோ இருந்தால் குடிக்க வேண்டாம்.', 'कुएँ का पानी देखें। गंदला या बदबूदार हो तो न पिएँ।'],
+  p3c: ['Throw away food that touched flood water.', 'வெள்ள நீர் பட்ட உணவை வீசிவிடுங்கள்.', 'बाढ़ के पानी से छुआ खाना फेंक दें।'],
+  p3d: ['Empty standing water around the home so mosquitoes cannot breed.', 'வீட்டைச் சுற்றித் தேங்கிய நீரை அகற்றுங்கள்; கொசு பெருகாது.', 'घर के आसपास जमा पानी हटाएँ ताकि मच्छर न पनपें।'],
+
+  /* Module 4 */
+  m4_sci_val: ['Rooftop Rainwater Harvesting (RWH) Autonomy Calculator', 'கூரை மழைநீர் சேகரிப்பு (RWH) தன்னிறைவு கணிப்பான்', 'छत वर्षा-जल संचयन (RWH) आत्मनिर्भरता कैलकुलेटर'],
+  m4_simple: [
+    'Rain that falls on your roof can be collected in a tank. This tells you how many days your family can use that water before it runs out.',
+    'உங்கள் கூரையில் விழும் மழைநீரை ஒரு தொட்டியில் சேமிக்கலாம். அந்தத் தண்ணீர் தீரும் வரை உங்கள் குடும்பம் எத்தனை நாள் பயன்படுத்தலாம் என்பதை இது சொல்லும்.',
+    'आपकी छत पर गिरी बारिश को टंकी में जमा किया जा सकता है। यह बताता है कि पानी खत्म होने से पहले आपका परिवार उसे कितने दिन इस्तेमाल कर सकता है।'],
+  m4_roof: ['Roof area (m²)', 'கூரைப் பரப்பு (ச.மீ)', 'छत का क्षेत्रफल (वर्ग मीटर)'],
+  m4_rain: ['Rain you will catch (mm)', 'நீங்கள் பிடிக்கும் மழை (மி.மீ)', 'आप जितनी बारिश पकड़ेंगे (मिमी)'],
+  m4_use_storm: ['Use this storm’s rain', 'இந்தப் புயலின் மழையைப் பயன்படுத்து', 'इस तूफ़ान की बारिश लें'],
+  m4_roof_type: ['Roof material', 'கூரைப் பொருள்', 'छत की सामग्री'],
+  m4_rc_help: ['Each material lets a different share of rain run off the roof (the “runoff factor”). Smoother roofs give more water.', 'ஒவ்வொரு பொருளும் வெவ்வேறு அளவு மழைநீரை ஓடவிடும் (“ஓட்டக் காரணி”). வழவழப்பான கூரை அதிக நீர் தரும்.', 'हर सामग्री से बारिश का अलग हिस्सा बहकर आता है (“रनऑफ़ फ़ैक्टर”)। चिकनी छत से ज़्यादा पानी मिलता है।'],
+  rt_concrete: ['Concrete slab', 'கான்கிரீட் தளம்', 'कंक्रीट की छत'],
+  rt_tile: ['Clay tiles', 'ஓடு கூரை', 'खपरैल / टाइल'],
+  rt_metal: ['Metal sheet', 'உலோகத் தகடு', 'धातु की चादर'],
+  rt_thatch: ['Thatch / leaves', 'ஓலை / இலை', 'फूस / पत्ते'],
+  m4_occ: ['People in your home', 'வீட்டில் உள்ளவர்கள்', 'घर में लोग'],
+  m4_cap: ['Tank or sump size (litres)', 'தொட்டி / சம்ப் அளவு (லிட்டர்)', 'टंकी या सम्प का आकार (लीटर)'],
+  m4_last: ['Your saved water will last', 'சேமித்த நீர் நீடிக்கும்', 'बचाया हुआ पानी चलेगा'],
+  m4_collect: ['Rain you can collect', 'சேகரிக்கக்கூடிய மழைநீர்', 'जमा हो सकने वाला पानी'],
+  m4_use: ['Your home uses each day', 'உங்கள் வீடு தினமும் பயன்படுத்துவது', 'आपका घर रोज़ इस्तेमाल करता है'],
+  m4_stored: ['Water actually stored', 'உண்மையில் சேமிக்கப்படுவது', 'असल में जमा पानी'],
+  days: ['days', 'நாட்கள்', 'दिन'],
+  litres: ['L', 'லி', 'ली'],
+  m4_full: ['Your tank fills up. About {x} litres would overflow and be wasted. A bigger tank would save more.', 'உங்கள் தொட்டி நிரம்பிவிடும். சுமார் {x} லிட்டர் வழிந்து வீணாகும். பெரிய தொட்டி அதிகம் சேமிக்கும்.', 'आपकी टंकी भर जाएगी। लगभग {x} लीटर बहकर बेकार जाएगा। बड़ी टंकी ज़्यादा बचाएगी।'],
+  m4_room: ['Your tank still has room for about {x} more litres.', 'உங்கள் தொட்டியில் இன்னும் சுமார் {x} லிட்டர் இடம் உள்ளது.', 'आपकी टंकी में अभी लगभग {x} लीटर और जगह है।'],
+  m4_formula_txt: [
+    'Water collected = roof area × rain × roof factor × 0.90 (10% is lost in the first wash). Days = the smaller of collected water and tank size ÷ daily use. Daily use = people × 135 litres (the Indian standard, IS:1172).',
+    'சேகரிக்கும் நீர் = கூரைப் பரப்பு × மழை × கூரைக் காரணி × 0.90 (முதல் கழுவலில் 10% இழப்பு). நாட்கள் = சேகரித்த நீர், தொட்டி அளவு இரண்டில் சிறியது ÷ தினசரி பயன்பாடு. தினசரி பயன்பாடு = ஆட்கள் × 135 லிட்டர் (இந்திய தரநிலை IS:1172).',
+    'जमा पानी = छत का क्षेत्रफल × बारिश × छत का फ़ैक्टर × 0.90 (पहली धुलाई में 10% नुकसान)। दिन = जमा पानी और टंकी के आकार में से जो छोटा हो ÷ रोज़ की खपत। रोज़ की खपत = लोग × 135 लीटर (भारतीय मानक IS:1172)।'],
+
+  /* Module 5 */
+  m5_sci_val: ['Citizen Reporting (Volunteered Geographic Information)', 'குடிமக்கள் புகார் அளிப்பு (தன்னார்வ புவிசார் தகவல்)', 'नागरिक रिपोर्टिंग (स्वैच्छिक भौगोलिक जानकारी)'],
+  m5_simple: [
+    'See a blocked drain or dirty water? Tell us. The most dangerous problems are shown first, so crews fix them first.',
+    'அடைபட்ட சாக்கடை அல்லது அசுத்த நீரைப் பார்த்தீர்களா? எங்களுக்குச் சொல்லுங்கள். மிக ஆபத்தான பிரச்சினைகள் முதலில் காட்டப்படும்; அவற்றை முதலில் சரிசெய்வார்கள்.',
+    'जाम नाली या गंदा पानी दिखा? हमें बताएँ। सबसे ख़तरनाक समस्याएँ सबसे ऊपर दिखती हैं, ताकि टीम उन्हें पहले ठीक करे।'],
+  f_title: ['New report', 'புதிய புகார்', 'नई शिकायत'],
+  f_type: ['What is the problem?', 'என்ன பிரச்சினை?', 'समस्या क्या है?'],
+  f_ward: ['Which ward?', 'எந்த வார்டு?', 'कौन-सा वार्ड?'],
+  f_people: ['People affected (about)', 'பாதிக்கப்பட்டோர் (தோராயமாக)', 'प्रभावित लोग (लगभग)'],
+  f_desc: ['What do you see? (optional)', 'என்ன பார்க்கிறீர்கள்? (விருப்பம்)', 'आप क्या देख रहे हैं? (वैकल्पिक)'],
+  f_desc_ph: ['Example: drain water is flowing into the street and smells bad', 'எ.கா: சாக்கடை நீர் தெருவில் ஓடுகிறது, துர்நாற்றம் வீசுகிறது', 'उदा: नाली का पानी सड़क पर बह रहा है और बदबू आ रही है'],
+  f_submit: ['Send report', 'புகாரை அனுப்பு', 'शिकायत भेजें'],
+  f_choose: ['Choose…', 'தேர்ந்தெடுக்கவும்…', 'चुनें…'],
+  f_err: ['Please choose the problem and the ward.', 'பிரச்சினையையும் வார்டையும் தேர்ந்தெடுக்கவும்.', 'कृपया समस्या और वार्ड चुनें।'],
+  tp_canal: ['Clogged canal', 'அடைபட்ட கால்வாய்', 'जाम नहर / नाला'],
+  tp_sewage: ['Sewage overflow', 'கழிவுநீர் வழிதல்', 'सीवेज ओवरफ़्लो'],
+  tp_sump: ['Contaminated sump or tank', 'மாசடைந்த சம்ப் அல்லது தொட்டி', 'दूषित सम्प या टंकी'],
+  tp_drain: ['Blocked drain', 'அடைபட்ட சாக்கடை', 'जाम नाली'],
+  lv_crit: ['Critical', 'மிக ஆபத்து', 'अति गंभीर'],
+  lv_high: ['High', 'அதிகம்', 'ज़्यादा'],
+  lv_med: ['Medium', 'நடுத்தரம்', 'मध्यम'],
+  lv_low: ['Low', 'குறைவு', 'कम'],
+  l_title: ['Reports, most dangerous first', 'புகார்கள், ஆபத்தானவை முதலில்', 'शिकायतें, सबसे ख़तरनाक पहले'],
+  l_all: ['All', 'அனைத்தும்', 'सभी'],
+  l_wait: ['Waiting', 'காத்திருப்பு', 'प्रतीक्षा में'],
+  l_fixed: ['Fixed', 'சரிசெய்யப்பட்டது', 'ठीक हुआ'],
+  l_why: ['Ranking uses: the type of problem, how risky the ward is right now, how many people are affected, and warning words such as “smell” or “children”.', 'வரிசைப்படுத்தும் முறை: பிரச்சினையின் வகை, வார்டின் தற்போதைய ஆபத்து, பாதிக்கப்பட்டோர் எண்ணிக்கை, “துர்நாற்றம்”, “குழந்தை” போன்ற எச்சரிக்கைச் சொற்கள்.', 'क्रम इन बातों से तय होता है: समस्या का प्रकार, वार्ड का अभी का जोखिम, प्रभावित लोगों की संख्या, और “बदबू”, “बच्चे” जैसे चेतावनी शब्द।'],
+  l_empty: ['No reports here.', 'இங்கு புகார்கள் இல்லை.', 'यहाँ कोई शिकायत नहीं।'],
+  l_people: ['people', 'பேர்', 'लोग'],
+  btn_resolve: ['Mark cleaned', 'சுத்தம் ஆனது', 'साफ़ हुआ'],
+  btn_reopen: ['Reopen', 'மீண்டும் திற', 'दोबारा खोलें'],
+  toast_sent: ['Report sent. It is #{r} of {n} waiting.', 'புகார் அனுப்பப்பட்டது. காத்திருப்பவற்றில் இது #{r} / {n}.', 'शिकायत भेजी गई। प्रतीक्षा में यह #{r} / {n} है।'],
+  toast_done: ['Marked cleaned. {w} risk is now {s}.', '“சுத்தம் ஆனது” எனக் குறிக்கப்பட்டது. {w} ஆபத்து இப்போது {s}.', 'साफ़ हुआ दर्ज किया। {w} का जोखिम अब {s} है।'],
+  toast_reopen: ['Reopened. {w} risk is now {s}.', 'மீண்டும் திறக்கப்பட்டது. {w} ஆபத்து இப்போது {s}.', 'दोबारा खोला गया। {w} का जोखिम अब {s} है।'],
+
+  /* Glossary + footer */
+  gl_title: ['Words made simple', 'எளிய சொற்கள் அகராதி', 'आसान शब्दकोश'],
+  gl_sub: ['Hard words used on this page, in plain language.', 'இந்தப் பக்கத்தில் வரும் கடினச் சொற்கள், எளிய மொழியில்.', 'इस पेज पर आए कठिन शब्द, आसान भाषा में।'],
+  gl_search: ['Search a word…', 'சொல்லைத் தேடுங்கள்…', 'शब्द खोजें…'],
+  gl_none: ['No matching word.', 'பொருந்தும் சொல் இல்லை.', 'कोई मिलता शब्द नहीं।'],
+  foot_sources: [
+    'Built on research: Swain et al. 2018 (weather flips), Curriero et al. 2001 (rain and waterborne disease), the Sendai Framework (disaster preparedness), Campisano et al. 2017 (rainwater harvesting) and Goodchild 2007 (citizen reports).',
+    'ஆய்வு அடிப்படை: Swain et al. 2018 (வானிலை மாற்றம்), Curriero et al. 2001 (மழையும் நீர்வழி நோயும்), செண்டாய் கட்டமைப்பு (பேரிடர் தயார்நிலை), Campisano et al. 2017 (மழைநீர் சேகரிப்பு), Goodchild 2007 (குடிமக்கள் புகார்).',
+    'शोध आधार: Swain et al. 2018 (मौसम का पलटना), Curriero et al. 2001 (बारिश और जलजनित रोग), सेंडाई फ्रेमवर्क (आपदा तैयारी), Campisano et al. 2017 (वर्षा-जल संचयन), Goodchild 2007 (नागरिक रिपोर्ट)।'],
+  foot_demo: [
+    'Demo numbers and ward names are simulated. Run fetch_data.py to use real rainfall from Open-Meteo.',
+    'மாதிரி எண்களும் வார்டு பெயர்களும் கற்பனையானவை. உண்மையான மழைத் தரவுக்கு fetch_data.py ஐ இயக்கவும் (Open-Meteo).',
+    'डेमो के आँकड़े और वार्ड के नाम काल्पनिक हैं। असली बारिश के आँकड़ों के लिए fetch_data.py चलाएँ (Open-Meteo)।']
+};
+
+/* Glossary: term and meaning in 3 languages */
+const GLOSS = [
+  { t: ['Hydroclimatic whiplash', 'நீர்வானிலைத் திடீர் மாற்றம்', 'मौसम का अचानक पलटना (व्हिपलैश)'],
+    m: ['A sudden swing from a long dry spell to very heavy rain.', 'நீண்ட வறட்சியிலிருந்து திடீரெனப் பெருமழைக்கு மாறுவது.', 'लंबे सूखे से अचानक बहुत तेज़ बारिश में बदल जाना।'] },
+  { t: ['Cloudburst', 'மேகவெடிப்பு (திடீர் பெருமழை)', 'बादल फटना'],
+    m: ['A huge amount of rain in a very short time.', 'மிகக் குறைந்த நேரத்தில் கொட்டும் அளவுக்கதிக மழை.', 'बहुत कम समय में बहुत ज़्यादा बारिश।'] },
+  { t: ['Runoff', 'மழைநீர் ஓட்டம்', 'बहाव (रनऑफ़)'],
+    m: ['Rain that flows over the ground instead of soaking into it.', 'மண்ணில் இறங்காமல் தரைமேல் ஓடும் மழைநீர்.', 'बारिश का वह पानी जो ज़मीन में समाने के बजाय ऊपर-ऊपर बह जाता है।'] },
+  { t: ['Pluvial flood', 'மழை வெள்ளம்', 'बारिश से आई बाढ़ (पल्वियल फ्लड)'],
+    m: ['A flood caused by rain overwhelming the streets and drains, not by a river overflowing.', 'ஆறு பெருகாமல், மழையே தெருக்களையும் சாக்கடைகளையும் மூழ்கடிப்பதால் வரும் வெள்ளம்.', 'नदी के उफान से नहीं, बल्कि बारिश से सड़कों और नालों के भर जाने से आने वाली बाढ़।'] },
+  { t: ['Sump', 'சம்ப் (தரைக்கீழ் தொட்டி)', 'सम्प (भूमिगत टंकी)'],
+    m: ['An underground tank that stores household water.', 'வீட்டு நீரைச் சேமிக்கும் தரைக்கீழ் தொட்டி.', 'घर का पानी जमा करने वाली ज़मीन के नीचे की टंकी।'] },
+  { t: ['Turbidity', 'கலங்கல் தன்மை', 'गंदलापन (टर्बिडिटी)'],
+    m: ['How muddy or cloudy water looks. Cloudy water may hide germs.', 'தண்ணீர் எவ்வளவு கலங்கலாகத் தெரிகிறது என்பது. கலங்கல் நீரில் கிருமிகள் இருக்கலாம்.', 'पानी कितना मटमैला या धुंधला दिखता है। धुंधले पानी में कीटाणु हो सकते हैं।'] },
+  { t: ['Chlorination', 'குளோரின் கிருமிநீக்கம்', 'क्लोरीनीकरण'],
+    m: ['Adding chlorine to water to kill germs.', 'கிருமிகளைக் கொல்ல தண்ணீரில் குளோரின் சேர்ப்பது.', 'कीटाणु मारने के लिए पानी में क्लोरीन मिलाना।'] },
+  { t: ['First flush', 'முதல் கழுவல்', 'पहली धुलाई (फ़र्स्ट फ़्लश)'],
+    m: ['The first rain that washes dust and droppings off the roof. Throw it away; save the clean rain after it.', 'கூரையிலிருந்து தூசி, கழிவைக் கழுவும் முதல் மழைநீர். இதை வெளியே விடுங்கள்; அதன்பின் வரும் சுத்த நீரைச் சேமியுங்கள்.', 'छत से धूल और बीट धोने वाली पहली बारिश। इसे बहने दें और उसके बाद का साफ़ पानी जमा करें।'] },
+  { t: ['Desilting', 'தூர்வாருதல்', 'गाद सफ़ाई (डीसिल्टिंग)'],
+    m: ['Removing mud, sand and rubbish from drains so water can flow.', 'தண்ணீர் ஓட சாக்கடைகளில் உள்ள சேறு, மணல், குப்பையை அகற்றுவது.', 'पानी बहता रहे इसलिए नालियों से कीचड़, रेत और कचरा निकालना।'] },
+  { t: ['Waterborne disease', 'நீர்வழி நோய்', 'जलजनित रोग'],
+    m: ['Sickness caused by germs in water, such as diarrhoea, cholera and typhoid.', 'தண்ணீரில் உள்ள கிருமிகளால் வரும் நோய்கள்: வயிற்றுப்போக்கு, காலரா, டைபாய்டு.', 'पानी में मौजूद कीटाणुओं से होने वाली बीमारियाँ, जैसे दस्त, हैज़ा और टाइफ़ाइड।'] },
+  { t: ['Runoff factor (coefficient)', 'ஓட்டக் காரணி (குணகம்)', 'रनऑफ़ फ़ैक्टर (गुणांक)'],
+    m: ['The share of rain that actually flows off a surface such as a roof.', 'கூரை போன்ற மேற்பரப்பிலிருந்து உண்மையில் ஓடும் மழையின் பங்கு.', 'छत जैसी सतह से असल में बहकर आने वाली बारिश का हिस्सा।'] },
+  { t: ['Autonomy (days)', 'தன்னிறைவு நாட்கள்', 'आत्मनिर्भरता के दिन'],
+    m: ['How many days your stored water lasts without any other source.', 'வேறு எந்த ஆதாரமும் இல்லாமல் சேமித்த நீர் எத்தனை நாள் நீடிக்கும் என்பது.', 'किसी और स्रोत के बिना आपका जमा पानी कितने दिन चलेगा।'] }
+];
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const LOCALE = { en: 'en-IN', ta: 'ta-IN', hi: 'hi-IN' };
+let lang = 'en';
+
+const li = () => LANGS.indexOf(lang);
+const t = (k, vars) => {
+  const e = T[k];
+  let s = e ? (e[li()] || e[0]) : k;
+  if (vars) for (const x in vars) s = s.split('{' + x + '}').join(vars[x]);
+  return s;
+};
+const nf = (n, d = 0) => {
+  try { return new Intl.NumberFormat(LOCALE[lang], { maximumFractionDigits: d, minimumFractionDigits: d }).format(n); }
+  catch (e) { return Number(n).toFixed(d); }
+};
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage may be blocked */ } }
+};
+const wardName = w => w.name[lang] || w.name.en;
+
+/* =====================================================================
+   BACKEND CALLS (Python does ALL calculations in server.py / engine.py)
+   ===================================================================== */
+async function api(path, body) {
+  const res = await fetch(path, body === undefined ? {} : {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(path + ' failed (' + res.status + ')');
+  return res.json();
+}
+const showBackendError = on => { $('#backendErr').hidden = on === false; };
+
+const state = {
+  tab: 'flip', scenario: 'whiplash', input: { scenario: 'whiplash' },
+  sel: 1, stage: 1, filter: 'all',
+  tank: { roof: 120, rain: 60, rt: 'concrete', occ: 4, cap: 3000 },
+  checks: {}
+};
+
+let reqId = 0;
+async function refresh(fromSlider) {
+  const my = ++reqId;
+  try {
+    const out = await api('/api/analyze', { input: state.input, tank: state.tank });
+    if (my !== reqId) return;
+    calc = out;
+    showBackendError(false);
+    renderAll(fromSlider);
+  } catch (e) { showBackendError(true); }
+}
+
+/* Read-only views of Python backend results */
+const metrics = () => calc.metrics;
+const wardCalc = w => calc.wards.find(x => x.id === w.id);
+const wardRisk = w => wardCalc(w);
+const complaints = w => wardCalc(w).complaints;
+const advisoryWards = () => WARDS.wards.filter(w => calc.advisory.includes(w.id));
+const riskClass = s => (s > 70 ? 'crit' : s >= 40 ? 'mod' : 'safe');
+const SEV_STYLE = {
+  crit: { bg: 'var(--crit-bg)', fg: 'var(--crit)' },
+  high: { bg: 'var(--warn-bg)', fg: 'var(--warn)' },
+  med: { bg: 'var(--soft)', fg: 'var(--rain)' },
+  low: { bg: 'var(--ok-bg)', fg: 'var(--ok)' }
+};
+
+/* =====================================================================
+   TOAST
+   ===================================================================== */
+let toastTimer;
+function toast(msg) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+/* =====================================================================
+   RENDER: static text
+   ===================================================================== */
+function applyStatic() {
+  document.documentElement.lang = lang;
+  $$('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  $$('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  $$('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+  $$('.langgrp button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+  $('#gaugeLbl').textContent = t('st_score');
+  $$('#filters .chip').forEach(b => {
+    b.textContent = t(b.dataset.f === 'all' ? 'l_all' : b.dataset.f === 'pending' ? 'l_wait' : 'l_fixed');
+  });
+}
+
+/* =====================================================================
+   RENDER: hero + gauge
+   ===================================================================== */
+let gaugeShown = 0, gaugeRaf = 0;
+function animateGauge(to) {
+  cancelAnimationFrame(gaugeRaf);
+  const from = gaugeShown, t0 = performance.now(), dur = 900;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const step = now => {
+    const k = reduce ? 1 : clamp((now - t0) / dur, 0, 1);
+    const e = 1 - Math.pow(1 - k, 3);
+    gaugeShown = from + (to - from) * e;
+    $('#gaugeNum').textContent = nf(gaugeShown, 1);
+    if (k < 1) gaugeRaf = requestAnimationFrame(step);
+  };
+  gaugeRaf = requestAnimationFrame(step);
+}
+function renderHero() {
+  const m = metrics();
+  const hero = $('#hero');
+  hero.dataset.level = m.level;
+  const arc = $('#gaugeArc');
+  arc.style.strokeDashoffset = String(282.74 * (1 - clamp(m.W, 0, 60) / 60));
+  arc.style.stroke = m.level === 'crit' ? '#ff8f86' : m.level === 'mod' ? '#ffcf6b' : '#7ef0be';
+  animateGauge(m.W);
+  $('#lvlTitle').textContent = t('lvl_' + m.level);
+  $('#lvlMsg').textContent = t('msg_' + m.level);
+  $('#chipRain').textContent = nf(m.surge, 1) + ' mm';
+  $('#chipDry').textContent = nf(m.mean, 2) + ' mm';
+  $('#chipWards').textContent = nf(advisoryWards().length) + ' / ' + nf(WARDS.wards.length);
+  $('#chipPending').textContent = nf(calc.tickets.filter(x => x.status === 'pending').length);
+  $$('#scenarios .scbtn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sc === state.scenario)));
+  wx.rain = clamp(m.surge / 100, 0.05, 1);
+}
+
+/* =====================================================================
+   RENDER: Module 1
+   ===================================================================== */
+let chart;
+function chartColors(m) {
+  const dry = cssv('--dry'), crit = cssv('--crit'), rain = cssv('--rain');
+  return calc.series.map((_, i) => i === m.idx ? crit : (i >= m.from && i < m.idx) ? dry : rain + '99');
+}
+function initChart() {
+  chart = new Chart($('#rainChart'), {
+    data: {
+      labels: [],
+      datasets: [
+        { type: 'bar', label: '', data: [], yAxisID: 'y', borderRadius: 4, order: 2 },
+        { type: 'line', label: '', data: [], yAxisID: 'y1', borderWidth: 2.5, tension: 0.35, pointRadius: 0, pointHitRadius: 10, order: 1 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      animation: { duration: 500 },
+      scales: {
+        x: { ticks: { maxTicksLimit: 10 }, grid: { display: false }, title: { display: true, text: '' } },
+        y: { beginAtZero: true, title: { display: true, text: '' } },
+        y1: { position: 'right', min: 20, max: 45, grid: { drawOnChartArea: false }, title: { display: true, text: '' } }
+      },
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+}
+function updateChart() {
+  if (!chart || !calc) return;
+  const m = metrics();
+  const muted = cssv('--muted'), line = cssv('--line'), dry = cssv('--dry');
+  Chart.defaults.color = muted;
+  Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+  chart.data.labels = calc.series.map((_, i) => i + 1);
+  const d0 = chart.data.datasets[0], d1 = chart.data.datasets[1];
+  d0.label = t('ch_rain'); d0.data = calc.series.map(d => d.p); d0.backgroundColor = chartColors(m);
+  d1.label = t('ch_temp'); d1.data = calc.series.map(d => d.t); d1.borderColor = dry; d1.backgroundColor = dry;
+  chart.options.scales.x.title.text = t('ch_day');
+  chart.options.scales.y.title.text = t('ch_rain');
+  chart.options.scales.y1.title.text = t('ch_temp');
+  chart.options.scales.y.grid.color = line;
+  chart.options.scales.x.title.color = muted;
+  chart.update();
+}
+function renderFlip(fromSlider) {
+  const m = metrics();
+  if (!fromSlider) {
+    $('#inDry').value = clamp(+m.mean.toFixed(1), 0, 10);
+    $('#inSurge').value = clamp(m.surge, 0, 150);
+  }
+  $('#outDry').textContent = nf(m.mean, 2) + ' mm';
+  $('#outSurge').textContent = nf(m.surge, 1) + ' mm';
+  const soak = 15 + (clamp(m.mean, 0, 10) / 10) * 55;
+  $('#soakPct').textContent = nf(soak) + '%';
+  $('#soakBar').style.width = soak + '%';
+  $('#formulaLive').textContent = nf(m.surge, 1) + ' ÷ (' + nf(m.mean, 2) + ' + 1) = ' + nf(m.W, 1);
+  $$('#bands [data-band]').forEach(b => {
+    const on = b.dataset.band === m.level;
+    b.style.outline = on ? '3px solid currentColor' : 'none';
+    b.style.outlineOffset = '2px';
+    b.style.opacity = on ? '1' : '.6';
+  });
+  updateChart();
+}
+
+/* =====================================================================
+   RENDER: Module 2 (Map & Wards)
+   ===================================================================== */
+function renderDirty() {
+  const adv = advisoryWards();
+  const box = $('#advisory');
+  if (adv.length) {
+    const names = adv.map(w => t('ward') + ' ' + w.id + ' (' + wardName(w) + ')').join(', ');
+    box.className = 'advisory on';
+    box.innerHTML =
+      '<div class="flex flex-wrap items-start justify-between gap-3">' +
+        '<div class="flex gap-3 items-start">' +
+          '<span class="pulse" style="width:44px;height:44px;border-radius:50%;background:var(--crit);color:#fff;display:grid;place-items:center;flex:0 0 auto">' +
+          '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 21h20L12 3Z"/><path d="M12 10v5M12 18v.01"/></svg></span>' +
+          '<div><div class="display text-xl font-extrabold c-crit">' + esc(t('adv_title_on')) + '</div>' +
+          '<p class="mt-1">' + esc(t('adv_msg_on', { w: names })) + '</p></div>' +
+        '</div>' +
+        '<button type="button" class="btn" id="copyAlert">' + esc(t('copy_alert')) + '</button>' +
+      '</div>';
+  } else {
+    box.className = 'advisory off';
+    box.innerHTML =
+      '<div class="flex gap-3 items-start"><span style="width:44px;height:44px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;flex:0 0 auto">' +
+      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>' +
+      '<div><div class="display text-xl font-extrabold c-safe">' + esc(t('adv_title_off')) + '</div><p class="mt-1">' + esc(t('adv_msg_off')) + '</p></div></div>';
+  }
+
+  $('#wardGrid').innerHTML = WARDS.wards.map(w => {
+    const r = wardRisk(w), c = riskClass(r.score);
+    const lab = c === 'crit' ? t('rk_high') : c === 'mod' ? t('rk_watch') : t('rk_low');
+    return '<button type="button" class="ward" data-ward="' + w.id + '" aria-pressed="' + (w.id === state.sel) + '">' +
+      '<div class="flex justify-between items-center gap-2"><span class="font-bold">' + esc(t('ward')) + ' ' + w.id + '</span>' +
+      (w.low_lying ? '<span title="' + esc(t('bd_low')) + '" aria-label="' + esc(t('bd_low')) + '">⬇</span>' : '<span title="" aria-hidden="true">⬆</span>') + '</div>' +
+      '<div class="text-sm muted" style="min-height:2.6em">' + esc(wardName(w)) + '</div>' +
+      '<div class="score c-' + c + '">' + nf(r.score, 0) + '</div>' +
+      '<span class="badge b-' + c + '" style="align-self:flex-start">' + esc(lab) + '</span>' +
+      '<div class="meter"><i style="width:' + clamp(r.score, 0, 100) + '%;background:var(--' + (c === 'crit' ? 'crit' : c === 'mod' ? 'warn' : 'ok') + ')"></i></div>' +
+      '</button>';
+  }).join('');
+  renderWardDetail();
+}
+
+function renderWardDetail() {
+  const w = WARDS.wards.find(x => x.id === state.sel) || WARDS.wards[0];
+  const r = wardRisk(w), c = riskClass(r.score);
+  const row = (label, part, max, color) =>
+    '<div><div class="flex justify-between gap-2 text-sm font-semibold"><span>' + esc(label) + '</span><span>' + nf(part, 1) + ' ' + esc(t('bd_of')) + ' ' + max + '</span></div>' +
+    '<div class="meter mt-1"><i style="width:' + (part / max * 100) + '%;background:' + color + '"></i></div></div>';
+  const fact = (k, v) => '<div class="soft p-3"><div class="text-sm muted">' + esc(k) + '</div><div class="font-bold">' + esc(v) + '</div></div>';
+  const doKey = c === 'crit' ? 'do_high' : c === 'mod' ? 'do_watch' : 'do_low';
+  $('#wardDetail').innerHTML =
+    '<div class="flex flex-wrap items-baseline justify-between gap-3 mb-4">' +
+      '<h3 class="display text-2xl font-extrabold">' + esc(t('ward')) + ' ' + w.id + ': ' + esc(wardName(w)) + '</h3>' +
+      '<span class="display text-3xl font-extrabold c-' + c + '">' + nf(r.score, 1) + ' / 100</span></div>' +
+    '<div class="grid md:grid-cols-2 gap-6">' +
+      '<div class="flex flex-col gap-4">' +
+        row(t('bd_rain'), r.rain, 45, 'var(--rain)') +
+        row(t('bd_choke'), r.choke, 35, 'var(--warn)') +
+        row(t('bd_low'), r.low, 20, 'var(--dry)') +
+        '<p class="muted text-sm">' + esc(t('w_score_line')) + '</p>' +
+        '<div class="hint"><b>' + esc(t('rk_' + (c === 'crit' ? 'high' : c === 'mod' ? 'watch' : 'low'))) + '</b>' + esc(t(doKey)) + '</div>' +
+      '</div>' +
+      '<div class="grid grid-cols-2 gap-3 content-start">' +
+        fact(t('w_elev'), nf(w.elevation_m, 1) + ' m') +
+        fact(t('w_low'), w.low_lying ? t('yes') : t('no')) +
+        fact(t('w_drain'), t('dt_' + w.drainage.type)) +
+        fact(t('w_complaints'), nf(complaints(w))) +
+        fact(t('w_desilt'), t('w_months', { n: nf(w.drainage.last_desilted_months_ago) })) +
+        fact(t('w_pop'), nf(w.population)) +
+      '</div>' +
+    '</div>';
+}
+
+function alertText() {
+  const m = metrics(), adv = advisoryWards();
+  let s = 'VarshaSync: ' + t('lvl_' + m.level) + ' (' + nf(m.W, 1) + '). ';
+  s += adv.length ? t('adv_title_on') + '. ' + t('adv_msg_on', { w: adv.map(w => t('ward') + ' ' + w.id + ' ' + wardName(w)).join(', ') }) : t('adv_msg_off');
+  return s;
+}
+
+async function copyAlert() {
+  const text = alertText();
+  try {
+    await navigator.clipboard.writeText(text);
+    toast(t('copied'));
+  } catch (e) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      toast(ok ? t('copied') : t('copy_fail'));
+    } catch (e2) { toast(t('copy_fail')); }
+  }
+}
+
+/* =====================================================================
+   RENDER: Module 3 (Checklist)
+   ===================================================================== */
+const PH = [
+  { id: 1, sci: 'Pre-Monsoon', tasks: ['p1a', 'p1b', 'p1c', 'p1d'] },
+  { id: 2, sci: 'Syn-Monsoon', tasks: ['p2a', 'p2b', 'p2c', 'p2d'] },
+  { id: 3, sci: 'Post-Monsoon', tasks: ['p3a', 'p3b', 'p3c', 'p3d'] }
+];
+const suggestedStage = () => (metrics().level === 'safe' ? 1 : 2);
+function renderGuide() {
+  const sug = suggestedStage();
+  $('#stageBtns').innerHTML = PH.map(p =>
+    '<button type="button" class="stagebtn" data-stage="' + p.id + '" aria-pressed="' + (state.stage === p.id) + '">' +
+    '<div class="font-bold">' + esc(t('ph' + p.id)) + '</div>' +
+    '<div class="text-sm muted">' + p.sci + (p.id === sug ? ' · <b style="color:var(--brand)">' + esc(t('m3_suggested')) + '</b>' : '') + '</div></button>'
+  ).join('');
+
+  let total = 0, done = 0;
+  $('#phases').innerHTML = PH.map(p => {
+    const locked = p.id > state.stage;
+    const d = p.tasks.filter(k => state.checks[k]).length;
+    total += p.tasks.length; done += d;
+    return '<div class="phase" data-locked="' + locked + '">' +
+      '<div class="flex justify-between items-start gap-2"><div><h3 class="display font-extrabold text-xl">' + esc(t('ph' + p.id)) + '</h3><div class="text-sm muted">' + p.sci + '</div></div>' +
+      '<span class="badge ' + (d === p.tasks.length ? 'b-safe' : 'b-mod') + '">' + d + '/' + p.tasks.length + '</span></div>' +
+      '<div class="meter my-3"><i style="width:' + (d / p.tasks.length * 100) + '%;background:var(--brand)"></i></div>' +
+      (locked ? '<p class="text-sm font-semibold mb-2">🔒 ' + esc(t('m3_locked')) + '</p>' : '') +
+      p.tasks.map(k =>
+        '<label class="task"><input type="checkbox" data-task="' + k + '"' + (state.checks[k] ? ' checked' : '') + (locked ? ' disabled' : '') + '><span>' + esc(t(k)) + '</span></label>'
+      ).join('') + '</div>';
+  }).join('');
+  const pct = Math.round(done / total * 100);
+  $('#overallPct').textContent = nf(pct) + '% (' + done + '/' + total + ' ' + t('m3_done') + ')';
+  $('#overallBar').style.width = pct + '%';
+}
+
+/* =====================================================================
+   RENDER: Module 4 (Tank)
+   ===================================================================== */
+function renderRoofTypes() {
+  $('#roofTypes').innerHTML = Object.keys(RC).map(k =>
+    '<button type="button" class="chip" data-rt="' + k + '" aria-pressed="' + (state.tank.rt === k) + '">' + esc(t('rt_' + k)) + ' (' + RC[k].toFixed(2) + ')</button>'
+  ).join('');
+}
+const DROP_SVG = '<svg viewBox="0 0 18 24" width="18" height="24"><path d="M9 1C9 1 2 9.5 2 15a7 7 0 0 0 14 0C16 9.5 9 1 9 1Z" fill="var(--rain)"/></svg>';
+function renderTank() {
+  const k = state.tank;
+  const r = calc.tank;
+  $('#tkRoofV').textContent = nf(k.roof) + ' m²';
+  $('#tkRainV').textContent = nf(k.rain) + ' mm';
+  $('#tkOccV').textContent = nf(k.occ);
+  $('#tkCapV').textContent = nf(k.cap) + ' ' + t('litres');
+  $('#outYield').textContent = nf(r.y) + ' ' + t('litres');
+  $('#outDaily').textContent = nf(r.daily) + ' ' + t('litres');
+  $('#outStored').textContent = nf(r.stored) + ' ' + t('litres');
+  $('#daysOut').textContent = nf(r.days, 1) + ' ' + t('days');
+  const fill = k.cap ? clamp(r.stored / k.cap, 0, 1) : 0;
+  const water = $('#tankWater');
+  water.setAttribute('y', String(176 - 152 * fill));
+  water.setAttribute('height', String(152 * fill));
+  $('#tankPct').textContent = Math.round(fill * 100) + '%';
+  $('#tankNote').textContent = r.over > 0 ? t('m4_full', { x: nf(r.over) }) : t('m4_room', { x: nf(r.room) });
+  const whole = Math.min(30, Math.floor(r.days)), frac = r.days - Math.floor(r.days);
+  let drops = '';
+  for (let i = 0; i < whole; i++) drops += '<span class="drop">' + DROP_SVG + '</span>';
+  if (whole < 30 && frac > 0.05) drops += '<span class="drop" style="opacity:' + (0.25 + frac * 0.5).toFixed(2) + '">' + DROP_SVG + '</span>';
+  $('#drops').innerHTML = drops;
+  $$('#roofTypes .chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.rt === k.rt)));
+}
+
+/* =====================================================================
+   RENDER: Module 5 (Ledger)
+   ===================================================================== */
+function fillFormSelects() {
+  const typeSel = $('#fType'), wardSel = $('#fWard');
+  const tv = typeSel.value, wv = wardSel.value;
+  typeSel.innerHTML = '<option value="">' + esc(t('f_choose')) + '</option>' +
+    ['sewage', 'canal', 'sump', 'drain'].map(k => '<option value="' + k + '">' + esc(t('tp_' + k)) + '</option>').join('');
+  wardSel.innerHTML = '<option value="">' + esc(t('f_choose')) + '</option>' +
+    WARDS.wards.map(w => '<option value="' + w.id + '">' + esc(t('ward')) + ' ' + w.id + ': ' + esc(wardName(w)) + '</option>').join('');
+  typeSel.value = tv; wardSel.value = wv;
+}
+
+function ago(ts) {
+  try {
+    const rtf = new Intl.RelativeTimeFormat(LOCALE[lang], { numeric: 'auto' });
+    const m = Math.round((ts - Date.now()) / 60000);
+    if (Math.abs(m) < 60) return rtf.format(m, 'minute');
+    const h = Math.round(m / 60);
+    if (Math.abs(h) < 24) return rtf.format(h, 'hour');
+    return rtf.format(Math.round(h / 24), 'day');
+  } catch (e) { return ''; }
+}
+
+function renderLedger() {
+  const pend = calc.tickets.filter(x => x.status === 'pending');
+  const fixed = calc.tickets.filter(x => x.status === 'resolved');
+  const scored = x => ({ tk: x, sev: x.sev, lvl: x.level });
+  const pendSorted = pend.map(scored).sort((a, b) => b.sev - a.sev);
+  const fixedSorted = fixed.map(scored).sort((a, b) => b.sev - a.sev);
+
+  const counts = { crit: 0, high: 0, med: 0, low: 0 };
+  pendSorted.forEach(x => counts[x.lvl]++);
+  const lv = ['crit', 'high', 'med', 'low'];
+  $('#qbar').innerHTML = pend.length
+    ? lv.map(k => '<i style="flex-grow:' + counts[k] + ';background:' + SEV_STYLE[k].fg + '"></i>').join('')
+    : '';
+  $('#qlegend').innerHTML = lv.map(k =>
+    '<span class="badge" style="background:' + SEV_STYLE[k].bg + ';color:' + SEV_STYLE[k].fg + '">' + esc(t('lv_' + k)) + ': ' + nf(counts[k]) + '</span>').join('');
+
+  $$('#filters .chip').forEach(b => {
+    const f = b.dataset.f;
+    const n = f === 'all' ? calc.tickets.length : f === 'pending' ? pend.length : fixed.length;
+    b.textContent = t(f === 'all' ? 'l_all' : f === 'pending' ? 'l_wait' : 'l_fixed') + ' ' + nf(n);
+    b.setAttribute('aria-pressed', String(state.filter === f));
+  });
+
+  let list = [];
+  if (state.filter === 'all') list = pendSorted.concat(fixedSorted);
+  else if (state.filter === 'pending') list = pendSorted;
+  else list = fixedSorted;
+
+  if (!list.length) { $('#ledger').innerHTML = '<div class="card p-6 text-center muted">' + esc(t('l_empty')) + '</div>'; return; }
+  let rank = 0;
+  $('#ledger').innerHTML = list.map(x => {
+    const tk = x.tk, w = WARDS.wards.find(q => q.id === tk.ward), lvl = x.lvl, st = SEV_STYLE[lvl];
+    const done = tk.status === 'resolved';
+    if (!done) rank++;
+    return '<div class="tk" data-done="' + done + '">' +
+      '<div class="rank" style="background:' + (done ? 'var(--ok-bg)' : st.bg) + ';color:' + (done ? 'var(--ok)' : st.fg) + '">' + (done ? '✓' : rank) + '</div>' +
+      '<div class="min-w-0">' +
+        '<div class="flex flex-wrap items-center gap-2">' +
+          '<b>' + esc(t('tp_' + tk.type)) + '</b>' +
+          '<span class="badge" style="background:' + st.bg + ';color:' + st.fg + '">' + esc(t('lv_' + lvl)) + ' ' + nf(x.sev, 0) + '</span>' +
+        '</div>' +
+        '<div class="text-sm muted">' + esc(t('ward')) + ' ' + tk.ward + ' · ' + esc(wardName(w)) + ' · ' + nf(tk.people) + ' ' + esc(t('l_people')) + ' · ' + esc(ago(tk.ts)) + '</div>' +
+        (tk.desc ? '<p class="mt-1">' + esc(tk.desc) + '</p>' : '') +
+        '<div class="mt-3"><button type="button" class="btn ' + (done ? '' : 'btn-primary') + '" data-act="' + (done ? 'reopen' : 'resolve') + '" data-id="' + tk.id + '">' + esc(t(done ? 'btn_reopen' : 'btn_resolve')) + '</button></div>' +
+      '</div></div>';
+  }).join('');
+}
+
+/* =====================================================================
+   RENDER: Glossary
+   ===================================================================== */
+function renderGlossary() {
+  const q = $('#glSearch').value.trim().toLowerCase();
+  const items = GLOSS.filter(g => !q || g.t.concat(g.m).some(s => s.toLowerCase().includes(q)));
+  $('#glossary').innerHTML = items.length
+    ? items.map(g =>
+        '<div class="gl"><div class="font-bold">' + esc(g.t[li()]) + '</div>' +
+        (lang !== 'en' ? '<div class="text-sm muted">' + esc(g.t[0]) + '</div>' : '') +
+        '<p class="mt-1">' + esc(g.m[li()]) + '</p></div>').join('')
+    : '<p class="muted">' + esc(t('gl_none')) + '</p>';
+}
+
+/* =====================================================================
+   MASTER RENDER
+   ===================================================================== */
+function renderAll(fromSlider) {
+  if (!calc) return;
+  renderHero();
+  renderFlip(fromSlider);
+  renderDirty();
+  renderGuide();
+  renderTank();
+  renderLedger();
+}
+
+function setLang(l) {
+  lang = l;
+  store.set('varshasync.lang', l);
+  applyStatic();
+  fillFormSelects();
+  renderRoofTypes();
+  renderGlossary();
+  renderAll(true);
+}
+
+/* =====================================================================
+   SCENARIOS
+   ===================================================================== */
+async function loadScenario(key, silent) {
+  try {
+    await api('/api/scenario', { name: key });
+  } catch (e) { showBackendError(true); return; }
+  state.scenario = key;
+  state.input = key === 'whiplash' ? { scenario: 'whiplash' }
+    : key === 'base' ? { mean: 4.0, surge: 18 } : { mean: 6.0, surge: 70 };
+  await refresh(false);
+  if (!calc) return;
+  state.stage = suggestedStage();
+  renderGuide();
+  if (!silent) toast(t('toast_sc', { n: t('sc_' + key) }));
+}
+
+/* =====================================================================
+   WEATHER CANVAS (Hero)
+   ===================================================================== */
+const wx = { drops: [], w: 0, h: 0, wind: 0, rain: 0.9, ctx: null };
+function wxResize() {
+  const c = $('#wx'); if (!c) return;
+  const r = c.parentElement.getBoundingClientRect();
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  c.width = Math.max(1, r.width * dpr); c.height = Math.max(1, r.height * dpr);
+  wx.ctx = c.getContext('2d'); wx.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  wx.w = r.width; wx.h = r.height;
+}
+const newDrop = () => ({ x: Math.random() * (wx.w + 80) - 40, y: Math.random() * -wx.h, v: 6 + Math.random() * 9, l: 8 + Math.random() * 16 });
+function wxFrame() {
+  const ctx = wx.ctx; if (!ctx) return;
+  ctx.clearRect(0, 0, wx.w, wx.h);
+  const target = Math.round(10 + wx.rain * 170);
+  while (wx.drops.length < target) wx.drops.push(newDrop());
+  if (wx.drops.length > target) wx.drops.length = target;
+  ctx.strokeStyle = 'rgba(190,230,255,.5)'; ctx.lineWidth = 1.3; ctx.lineCap = 'round';
+  ctx.beginPath();
+  for (const d of wx.drops) {
+    d.y += d.v * (0.6 + wx.rain); d.x += wx.wind * d.v * 0.15;
+    if (d.y > wx.h + 20) { d.y = -20; d.x = Math.random() * (wx.w + 80) - 40; }
+    ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + wx.wind * d.l * 0.15, d.y + d.l);
+  }
+  ctx.stroke();
+}
+function wxLoop() {
+  if (!document.hidden) wxFrame();
+  requestAnimationFrame(wxLoop);
+}
+
+/* =====================================================================
+   LIVE RADAR MAP & GEOLOCATION
+   ===================================================================== */
+function drawRadar(lat, lon) {
+  const canvas = $('#liveRadarCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.parentElement.clientWidth;
+  canvas.height = canvas.parentElement.clientHeight;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+  ctx.strokeStyle = cssv('--line');
+  ctx.lineWidth = 1.5;
+  [40, 80, 110].forEach(r => {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+    ctx.stroke();
+  });
+  
+  // User coordinate pin
+  ctx.fillStyle = cssv('--crit');
+  ctx.beginPath();
+  ctx.arc(cx, cy, 7, 0, 2 * Math.PI);
+  ctx.fill();
+  ctx.fillStyle = cssv('--ink');
+  ctx.font = '12px Figtree, sans-serif';
+  ctx.fillText('You (' + lat.toFixed(2) + ', ' + lon.toFixed(2) + ')', cx + 12, cy + 4);
+}
+
+function handleLiveLocation() {
+  if (!navigator.geolocation) {
+    toast(t('loc_err'));
+    return;
+  }
+  $('#locStatusBadge').textContent = t('loc_fetching');
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const { latitude, longitude } = pos.coords;
+      $('#mapCoordsDisplay').textContent = `Lat: ${latitude.toFixed(3)}, Lon: ${longitude.toFixed(3)}`;
+      try {
+        const out = await api('/api/live', { lat: latitude, lon: longitude });
+        calc = out;
+        if (out.dynamic_wards && out.dynamic_wards.length > 0) {
+          WARDS.wards = out.dynamic_wards;
+          fillFormSelects();
+        }
+        showBackendError(false);
+        renderAll(false);
+        drawRadar(latitude, longitude);
+        $('#locStatusBadge').textContent = 'Live Active';
+        toast('Wards updated to your real surrounding towns!');
+      } catch (e) {
+        showBackendError(true);
+      }
+    },
+    () => {
+      toast(t('loc_err'));
+      $('#locStatusBadge').textContent = 'Error';
+    },
+    { timeout: 10000 }
+  );
+}
+/* =====================================================================
+   EVENTS
+   ===================================================================== */
+function bind() {
+  $('#locBtn').addEventListener('click', handleLiveLocation);
+
+  $$('.langgrp button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+  $('#themeBtn').addEventListener('click', () => {
+    const cur = document.documentElement.dataset.theme ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    store.set('varshasync.theme', next);
+    setTimeout(() => renderAll(true), 30);
+  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => setTimeout(updateChart, 30));
+
+  const tabs = $$('#tabs .tab');
+  const showTab = (name, focus) => {
+    state.tab = name;
+    tabs.forEach(b => {
+      const on = b.dataset.tab === name;
+      b.setAttribute('aria-selected', String(on));
+      b.tabIndex = on ? 0 : -1;
+      if (on && focus) b.focus();
+    });
+    $$('.panel').forEach(p => { p.hidden = p.id !== 'panel-' + name; });
+    if (name === 'flip') setTimeout(updateChart, 20);
+    if (name === 'dirty') setTimeout(() => drawRadar(13.08, 80.27), 20);
+  };
+  tabs.forEach((b, i) => {
+    b.addEventListener('click', () => showTab(b.dataset.tab));
+    b.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') showTab(tabs[(i + 1) % tabs.length].dataset.tab, true);
+      if (e.key === 'ArrowLeft') showTab(tabs[(i - 1 + tabs.length) % tabs.length].dataset.tab, true);
+    });
+  });
+  showTab('flip');
+
+  $$('#scenarios .scbtn').forEach(b => b.addEventListener('click', () => loadScenario(b.dataset.sc)));
+
+  const onSlide = () => {
+    state.input = { mean: parseFloat($('#inDry').value), surge: parseFloat($('#inSurge').value) };
+    state.scenario = 'custom';
+    refresh(true);
+  };
+  $('#inDry').addEventListener('input', onSlide);
+  $('#inSurge').addEventListener('input', onSlide);
+
+  $('#wardGrid').addEventListener('click', e => {
+    const b = e.target.closest('[data-ward]'); if (!b) return;
+    state.sel = +b.dataset.ward;
+    $$('#wardGrid .ward').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    renderWardDetail();
+  });
+  $('#advisory').addEventListener('click', e => { if (e.target.closest('#copyAlert')) copyAlert(); });
+
+  $('#stageBtns').addEventListener('click', e => {
+    const b = e.target.closest('[data-stage]'); if (!b) return;
+    state.stage = +b.dataset.stage; renderGuide();
+  });
+  $('#phases').addEventListener('change', e => {
+    const c = e.target.closest('[data-task]'); if (!c) return;
+    state.checks[c.dataset.task] = c.checked;
+    store.set('varshasync.checks', JSON.stringify(state.checks));
+    renderGuide();
+  });
+  $('#resetChecks').addEventListener('click', () => {
+    state.checks = {}; store.set('varshasync.checks', '{}'); renderGuide();
+  });
+
+  const bindRange = (id, key) => $(id).addEventListener('input', e => { state.tank[key] = parseFloat(e.target.value); refresh(true); });
+  bindRange('#tkRoof', 'roof'); bindRange('#tkRain', 'rain'); bindRange('#tkOcc', 'occ'); bindRange('#tkCap', 'cap');
+  $('#roofTypes').addEventListener('click', e => {
+    const b = e.target.closest('[data-rt]'); if (!b) return;
+    state.tank.rt = b.dataset.rt; refresh(true);
+  });
+  $('#useStorm').addEventListener('click', () => {
+    const s = Math.round(metrics().surge);
+    state.tank.rain = clamp(s, 0, 300);
+    $('#tkRain').value = state.tank.rain;
+    refresh(true);
+  });
+
+  $('#fSubmit').addEventListener('click', async () => {
+    const type = $('#fType').value, ward = +$('#fWard').value;
+    const err = $('#fError');
+    if (!type || !ward) { err.textContent = t('f_err'); return; }
+    err.textContent = '';
+    const people = clamp(parseInt($('#fPeople').value, 10) || 1, 1, 5000);
+    try {
+      const res = await api('/api/tickets', { type, ward, people, desc: $('#fDesc').value.trim() });
+      $('#fDesc').value = '';
+      state.filter = 'pending';
+      await refresh(true);
+      toast(t('toast_sent', { r: nf(res.rank), n: nf(res.pending) }));
+    } catch (e) { showBackendError(true); }
+  });
+  $('#filters').addEventListener('click', e => {
+    const b = e.target.closest('[data-f]'); if (!b) return;
+    state.filter = b.dataset.f; renderLedger();
+  });
+  $('#ledger').addEventListener('click', async e => {
+    const b = e.target.closest('[data-act]'); if (!b || !calc) return;
+    const tk = calc.tickets.find(x => x.id === +b.dataset.id); if (!tk) return;
+    const resolving = b.dataset.act === 'resolve';
+    try {
+      await api('/api/tickets/status', { id: tk.id, status: resolving ? 'resolved' : 'pending' });
+      await refresh(true);
+      const w = WARDS.wards.find(x => x.id === tk.ward);
+      toast(t(resolving ? 'toast_done' : 'toast_reopen', { w: t('ward') + ' ' + w.id, s: nf(wardRisk(w).score, 1) }));
+    } catch (err) { showBackendError(true); }
+  });
+
+  $('#glSearch').addEventListener('input', renderGlossary);
+
+  window.addEventListener('resize', () => { wxResize(); });
+  $('#hero').addEventListener('pointermove', e => {
+    const r = $('#hero').getBoundingClientRect();
+    wx.wind = ((e.clientX - r.left) / r.width - 0.5) * 8;
+  });
+}
+
+/* =====================================================================
+   BOOT
+   ===================================================================== */
+async function boot() {
+  const savedTheme = store.get('varshasync.theme');
+  if (savedTheme === 'light' || savedTheme === 'dark') document.documentElement.dataset.theme = savedTheme;
+  try { state.checks = JSON.parse(store.get('varshasync.checks') || '{}') || {}; } catch (e) { state.checks = {}; }
+  const savedLang = store.get('varshasync.lang');
+  if (LANGS.includes(savedLang)) lang = savedLang;
+
+  initChart();
+  bind();
+  wxResize();
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { wxFrame(); } else { wxLoop(); }
+  applyStatic();
+  renderGlossary();
+  try {
+    const boot = await api('/api/bootstrap');
+    WARDS = boot.wards; RC = boot.roof_factors;
+  } catch (e) { showBackendError(true); return; }
+  fillFormSelects();
+  renderRoofTypes();
+  await loadScenario('whiplash', true);
+}
+boot();
+})();
+</script>
+</body>
+</html>

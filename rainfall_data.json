@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "title": "VarshaSync demo series: 28 dry days, then a cloudburst",
+    "source": "Synthetic demonstration series shaped like a real hydroclimatic whiplash event. Use fetch_data.py to download real ERA5 observations in this same format.",
+    "units": { "precip_mm": "millimetres per day", "temp_max_c": "degrees Celsius" },
+    "dry_spell_threshold_mm": 2.0,
+    "whiplash_threshold_mm": 80.0,
+    "surge_day": 29,
+    "synthetic": true
+  },
+  "daily": [
+    { "day": 1,  "precip_mm": 0.0,  "temp_max_c": 37.1 },
+    { "day": 2,  "precip_mm": 0.2,  "temp_max_c": 37.8 },
+    { "day": 3,  "precip_mm": 0.0,  "temp_max_c": 38.2 },
+    { "day": 4,  "precip_mm": 0.0,  "temp_max_c": 38.9 },
+    { "day": 5,  "precip_mm": 0.4,  "temp_max_c": 39.4 },
+    { "day": 6,  "precip_mm": 0.0,  "temp_max_c": 38.7 },
+    { "day": 7,  "precip_mm": 0.0,  "temp_max_c": 38.1 },
+    { "day": 8,  "precip_mm": 1.1,  "temp_max_c": 37.5 },
+    { "day": 9,  "precip_mm": 0.0,  "temp_max_c": 38.3 },
+    { "day": 10, "precip_mm": 0.0,  "temp_max_c": 39.0 },
+    { "day": 11, "precip_mm": 0.3,  "temp_max_c": 39.8 },
+    { "day": 12, "precip_mm": 0.0,  "temp_max_c": 40.1 },
+    { "day": 13, "precip_mm": 0.0,  "temp_max_c": 39.6 },
+    { "day": 14, "precip_mm": 0.6,  "temp_max_c": 38.8 },
+    { "day": 15, "precip_mm": 0.0,  "temp_max_c": 38.4 },
+    { "day": 16, "precip_mm": 0.0,  "temp_max_c": 39.1 },
+    { "day": 17, "precip_mm": 0.2,  "temp_max_c": 39.7 },
+    { "day": 18, "precip_mm": 0.0,  "temp_max_c": 40.2 },
+    { "day": 19, "precip_mm": 1.4,  "temp_max_c": 39.5 },
+    { "day": 20, "precip_mm": 0.0,  "temp_max_c": 38.9 },
+    { "day": 21, "precip_mm": 0.0,  "temp_max_c": 38.2 },
+    { "day": 22, "precip_mm": 0.0,  "temp_max_c": 38.6 },
+    { "day": 23, "precip_mm": 0.5,  "temp_max_c": 39.3 },
+    { "day": 24, "precip_mm": 0.0,  "temp_max_c": 39.9 },
+    { "day": 25, "precip_mm": 0.0,  "temp_max_c": 40.4 },
+    { "day": 26, "precip_mm": 0.3,  "temp_max_c": 39.8 },
+    { "day": 27, "precip_mm": 0.0,  "temp_max_c": 38.7 },
+    { "day": 28, "precip_mm": 0.8,  "temp_max_c": 37.9 },
+    { "day": 29, "precip_mm": 94.5, "temp_max_c": 27.1 },
+    { "day": 30, "precip_mm": 61.2, "temp_max_c": 26.4 }
+  ]
+}
