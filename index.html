@@ -7,6 +7,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+  // Suppress the Tailwind CDN production warning
+  const _warn = console.warn;
+  console.warn = function(...args) {
+    if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+    _warn.apply(console, args);
+  };
+</script>
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -805,12 +813,32 @@ const wardName = w => (w.name && (w.name[lang] || w.name.en)) || w.name || '';
    ===================================================================== */
 async function api(path, body) {
   const res = await fetch(path, body === undefined ? {} : {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
   });
   if (!res.ok) throw new Error(path + ' failed (' + res.status + ')');
   return res.json();
 }
-const showBackendError = on => { $('#backendErr').hidden = on === false; };
+
+const showBackendError = on => { 
+  const el = $('#backendErr');
+  if (el) el.hidden = on === false; 
+};
+
+/* Read-only views of Python backend results */
+const metrics = () => calc && calc.metrics ? calc.metrics : {};
+const wardCalc = w => (calc && calc.wards ? calc.wards.find(x => x.id === w.id) : null);
+const wardRisk = w => wardCalc(w);
+const complaints = w => { const wc = wardCalc(w); return wc ? wc.complaints : []; };
+const advisoryWards = () => (calc && calc.advisory ? WARDS.wards.filter(w => calc.advisory.includes(w.id)) : []);
+const riskClass = s => (s > 70 ? 'crit' : s >= 40 ? 'mod' : 'safe');
+const SEV_STYLE = {
+  crit: { bg: 'var(--crit-bg)', fg: 'var(--crit)' },
+  high: { bg: 'var(--warn-bg)', fg: 'var(--warn)' },
+  med: { bg: 'var(--soft)', fg: 'var(--rain)' },
+  low: { bg: 'var(--ok-bg)', fg: 'var(--ok)' }
+};
 
 const state = {
   tab: 'flip', scenario: 'whiplash', input: { scenario: 'whiplash' },
@@ -1078,20 +1106,20 @@ const PH = [
   { id: 2, sci: 'Syn-Monsoon', tasks: ['p2a', 'p2b', 'p2c', 'p2d'] },
   { id: 3, sci: 'Post-Monsoon', tasks: ['p3a', 'p3b', 'p3c', 'p3d'] }
 ];
-function metrics() {
-  return (typeof calc !== 'undefined' && calc && calc.metrics) ? calc.metrics : {};
-}
-function wardCalc(w) {
-  return (typeof calc !== 'undefined' && calc && calc.wards) ? calc.wards.find(x => x.id === (w ? w.id : null)) : null;
-}
-function wardRisk(w) { return wardCalc(w); }
-function complaints(w) { const wc = wardCalc(w); return wc && wc.complaints ? wc.complaints : []; }
-function advisoryWards() {
-  return (typeof calc !== 'undefined' && calc && calc.advisory && typeof WARDS !== 'undefined' && WARDS.wards)
-    ? WARDS.wards.filter(w => calc.advisory.includes(w.id))
-    : [];
-}
-function riskClass(s) { return s > 70 ? 'crit' : s >= 40 ? 'mod' : 'safe'; }  
+/* Read-only views of Python backend results */
+const metrics = () => (calc && calc.metrics ? calc.metrics : {});
+const wardCalc = w => (calc && calc.wards ? calc.wards.find(x => x.id === w.id) : null);
+const wardRisk = w => wardCalc(w);
+const complaints = w => { const wc = wardCalc(w); return wc ? wc.complaints : []; };
+const advisoryWards = () => (calc && calc.advisory && WARDS && WARDS.wards ? WARDS.wards.filter(w => calc.advisory.includes(w.id)) : []);
+const riskClass = s => (s > 70 ? 'crit' : s >= 40 ? 'mod' : 'safe');
+const SEV_STYLE = {
+  crit: { bg: 'var(--crit-bg)', fg: 'var(--crit)' },
+  high: { bg: 'var(--warn-bg)', fg: 'var(--warn)' },
+  med: { bg: 'var(--soft)', fg: 'var(--rain)' },
+  low: { bg: 'var(--ok-bg)', fg: 'var(--ok)' }
+};
+
 const suggestedStage = () => (metrics().level === 'safe' ? 1 : 2);
 function renderGuide() {
   const sug = suggestedStage();
