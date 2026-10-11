@@ -798,12 +798,12 @@ const store = {
   get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage may be blocked */ } }
 };
-const wardName = w => w.name[lang] || w.name.en;
+const wardName = w => (w.name && (w.name[lang] || w.name.en)) || w.name || '';
 
 /* =====================================================================
    BACKEND CALLS (Python does ALL calculations in server.py / engine.py)
    ===================================================================== */
-path, body) {
+async function api(path, body) {
   const res = await fetch(path, body === undefined ? {} : {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   });
