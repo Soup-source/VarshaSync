@@ -1078,6 +1078,20 @@ const PH = [
   { id: 2, sci: 'Syn-Monsoon', tasks: ['p2a', 'p2b', 'p2c', 'p2d'] },
   { id: 3, sci: 'Post-Monsoon', tasks: ['p3a', 'p3b', 'p3c', 'p3d'] }
 ];
+function metrics() {
+  return (typeof calc !== 'undefined' && calc && calc.metrics) ? calc.metrics : {};
+}
+function wardCalc(w) {
+  return (typeof calc !== 'undefined' && calc && calc.wards) ? calc.wards.find(x => x.id === (w ? w.id : null)) : null;
+}
+function wardRisk(w) { return wardCalc(w); }
+function complaints(w) { const wc = wardCalc(w); return wc && wc.complaints ? wc.complaints : []; }
+function advisoryWards() {
+  return (typeof calc !== 'undefined' && calc && calc.advisory && typeof WARDS !== 'undefined' && WARDS.wards)
+    ? WARDS.wards.filter(w => calc.advisory.includes(w.id))
+    : [];
+}
+function riskClass(s) { return s > 70 ? 'crit' : s >= 40 ? 'mod' : 'safe'; }  
 const suggestedStage = () => (metrics().level === 'safe' ? 1 : 2);
 function renderGuide() {
   const sug = suggestedStage();
